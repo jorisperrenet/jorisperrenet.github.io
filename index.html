@@ -1,54 +1,27 @@
 <!DOCTYPE html>
 <html lang="{{ site.lang | default: "en-US" }}">
 
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,maximum-scale=2">
-    <meta name="google-site-verification" content="google259c1e01add58981.html">
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,maximum-scale=2">
+  <meta name="keywords" content="Joris Perrenet">
+  <meta name="description" content="Personal Github Pages of Joris Perrenet">
+  <title>Joris Perrenet</title>
+  <link rel="stylesheet" type="text/css" href="static/style.css">
+  <meta name="google-site-verification" content="google259c1e01add58981.html">
+</head>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+<body>
+  <div class="container">
+    <h1>Welcome to my Github Pages!</h1>
+    <p>Visit my <a id="github/iscripts" href="https://github.com/jorisperrenet/iscripts">iscripts Page</a> instead.</p>
+    <p>Visit my <a id="github/dotfiles" href="https://github.com/jorisperrenet/dotfiles">dotfiles Page</a> instead.</p>
+    <p>Visit my <a id="github/BachelorThesis" href="https://github.com/jorisperrenet/BachelorThesis">BachelorThesis Page</a> instead.</p>
+    <p>Visit my <a id="github/durak" href="https://github.com/jorisperrenet/durak">Durak Page</a> instead.</p>
+    <p>Visit <a id="github-pages" href="https://github.com/jorisperrenet/jorisperrenet.github.io">this source</a> instead.</p>
+    <p>Otherwise, visit my <a id="github" href="https://github.com/jorisperrenet">Main Github Page</a> instead.</p>
+  </div>
+</body>
 
-{% seo %}
-    {% include head-custom.html %}
-  </head>
-
-  <body>
-
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          {% if site.github.is_project_page %}
-            <a id="forkme_banner" href="{{ site.github.repository_url }}">View on GitHub</a>
-          {% endif %}
-
-          <h1 id="project_title">{{ site.title | default: site.github.repository_name }}</h1>
-          <h2 id="project_tagline">{{ site.description | default: site.github.project_tagline }}</h2>
-
-          {% if site.show_downloads %}
-            <section id="downloads">
-              <a class="zip_download_link" href="{{ site.github.zip_url }}">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="{{ site.github.tar_url }}">Download this project as a tar.gz file</a>
-            </section>
-          {% endif %}
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        {{ content }}
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        {% if site.github.is_project_page %}
-        <p class="copyright">{{ site.title | default: site.github.repository_name }} maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
-        {% endif %}
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-  </body>
 </html>
