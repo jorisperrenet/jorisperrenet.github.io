@@ -1,32 +1,46 @@
 <!DOCTYPE html>
-<html lang="{{ site.lang | default: "en-US" }}">
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="./favicon.png" />
+		<meta name="viewport" content="width=device-width" />
+		
+		<link href="./_app/immutable/assets/0.310ddcda.css" rel="stylesheet">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.d084b3ce.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/scheduler.e108d1fd.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/singletons.a8103d76.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.2217cb7c.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index.bad58c3a.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/0.e93f97be.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/2.2500822f.js"><title>Joris&#39; website</title><!-- HEAD_svelte-xgkpcp_START --><meta name="description" content="Personal Website"><meta name="google-site-verification" content="zi8POYIKt3_zadpQhWa2QHEVLDNG_DwGKcojBNiWi_U"><!-- HEAD_svelte-xgkpcp_END -->
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">  <div class="flex flex-col min-h-screen bg-gray-100"><header class="m-auto" data-svelte-h="svelte-l2yikp"><nav><ul class="flex"><li><a href="/"><h1 class="px-4 py-2 text-black font-bold text-xl hover:bg-gray-300 hover:underline">HOME</h1></a></li> <li><a href="/projects"><h1 class="px-4 py-2 text-black font-bold text-xl hover:bg-gray-300 hover:underline">PROJECTS</h1></a></li> <li><a href="/about"><h1 class="px-4 py-2 text-black font-bold text-xl hover:bg-gray-300 hover:underline">ABOUT</h1></a></li></ul></nav></header> <main class="flex flex-col flex-1"> <div class="flex flex-col place-items-center my-auto" data-svelte-h="svelte-1ykc0xb"><img class="w-56 py-5" src="/_app/immutable/assets/personal-logo.28377653.svg" alt="avatar"> <h1 class="text-4xl font-light">Joris Perrenet</h1> <h2 class="text-xl font-semibold py-1">Math Student</h2> </div></main> <footer data-svelte-h="svelte-wzdbjc"><p class="text-center py-2">© 2023 - Joris Perrenet</p></footer></div> 
+			
+			<script>
+				{
+					__sveltekit_1jxpl6g = {
+						base: new URL(".", location).pathname.slice(0, -1),
+						env: {}
+					};
 
-<head>
-  <meta charset='utf-8'>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width,maximum-scale=2">
-  <meta name="keywords" content="Joris Perrenet">
-  <meta name="description" content="Personal Github Pages of Joris Perrenet">
-  <title>Joris Perrenet</title>
-  <link rel="stylesheet" type="text/css" href="static/style.css">
-  <meta name="google-site-verification" content="google259c1e01add58981.html">
-</head>
+					const element = document.currentScript.parentElement;
 
-<body>
-  <div class="container">
-    <h1>Welcome to my Github Pages!</h1>
-    <h1>As you can see, the site is under construction.</h1>
-    <p>Here is a link to my <a id="github/iscripts" href="https://github.com/jorisperrenet/iscripts">Iscripts</a>.</p>
-    <p>Here is a link to my <a id="github/dotfiles" href="https://github.com/jorisperrenet/dotfiles">Dotfiles</a>.</p>
-    <p>Here is a link to my <a id="github/BachelorThesis" href="https://github.com/jorisperrenet/BachelorThesis">BachelorThesis</a>.</p>
-    <p>Here is a link to my <a id="github/durak" href="https://github.com/jorisperrenet/durak">Durak Project</a>.</p>
-    <p>Here is a link to <a id="github-pages" href="https://github.com/jorisperrenet/jorisperrenet.github.io">the source of this page</a>.</p>
-    <p>Otherwise, please visit my <a id="github" href="https://github.com/jorisperrenet">Main Github Page</a>.</p>
-    <img class="center" src="https://projecteuler.net/profile/Joris_Perrenet.png"></img>
-    <a href="files/ec_primes_pfgw.txt" download="ec_prime_pfgw.txt">
-      <img src="files/ec_primes_pfgw.txt" alt="ec_prime_pfgw.txt">
-    </a>
-  </div>
-</body>
+					const data = [null,null];
 
+					Promise.all([
+						import("./_app/immutable/entry/start.d084b3ce.js"),
+						import("./_app/immutable/entry/app.2217cb7c.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2],
+							data,
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
 </html>
