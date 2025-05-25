@@ -1,6 +1,8 @@
 <script>
   import "../app.postcss";
   import Header from "./Header.svelte";
+  let now = new Date();
+  let year = now.getFullYear();
 </script>
 
 <div class="flex flex-col min-h-screen bg-gray-100">
@@ -12,7 +14,7 @@
 
   <footer>
     <p class="text-center py-2">
-      &copy 2025 - Joris Perrenet
+      &copy {year} - Joris Perrenet
     </p>
   </footer>
 </div>
