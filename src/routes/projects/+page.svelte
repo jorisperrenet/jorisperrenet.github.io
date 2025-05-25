@@ -10,7 +10,7 @@
 	<title>Joris' projects</title>
 </svelte:head>
 
-<div class="text-justify w-full max-w-4xl mx-auto px-10 my-10 text-lg">
+<div class="text-justify w-full max-w-5xl mx-auto px-10 my-10 text-lg">
     <h1 class="text-center text-3xl font-bold">
         My (programming) projects are listed below
     </h1>
@@ -73,15 +73,34 @@
             a detailed instruction on how to install and configure Arch Linux.
         </li>
         <li>
+            <a class="text-blue-600 underline" href="https://github.com/jorisperrenet/practice-math">practice-math</a>
+            &#8212
+            I have created a
+            <a class="text-blue-600 underline" href="https://jorisperrenet.github.io/practice-math/">tool</a>
+            that helps you with practicing math!
+            Currently, the only thing you can practice with are
+            <a class="text-blue-600 underline" href="https://jorisperrenet.github.io/practice-math/derivatives">derivatives</a>.
+        </li>
+        <li>
             <a class="text-blue-600 underline" href="https://github.com/jorisperrenet/MasterThesis">Master Thesis</a>
             &#8212
-            This repository contains the uncompiled version of my Master thesis conducted at Leiden University: <quote class="italic mx-auto"> "Decoding CSIDH: A guide to isogeny-based cryptography". </quote>
+            This repository contains the uncompiled version of my Master thesis conducted at Leiden University:
+            <quote class="italic mx-auto">
+            <a class="text-blue-600 underline" href="https://jorisperrenet.github.io/MasterThesis/build_latex/main.pdf">
+            "Decoding CSIDH: A guide to isogeny-based cryptography"
+            </a>
+            </quote>.
             It explains details of Finite Fields, Number Fields, and Elliptic Curves before we describe the CSIDH paper.
         </li>
         <li>
             <a class="text-blue-600 underline" href="https://github.com/jorisperrenet/BachelorThesis">Bachelor Thesis</a>
             &#8212
-            This repository contains the uncompiled version of my thesis conducted at the TUDelft: <quote class="italic mx-auto"> "Methods for reducing error in approximations of the Rayleigh integral". </quote>
+            This repository contains the uncompiled version of my thesis conducted at the TUDelft:
+            <quote class="italic mx-auto">
+            <a class="text-blue-600 underline" href="https://jorisperrenet.github.io/BachelorThesis/Approximating_Rayleigh_Integrals_Joris_Perrenet.pdf">
+            "Methods for reducing error in approximations of the Rayleigh integral"
+            </a>
+            </quote>.
             It also
             <a class="text-blue-600 underline" href="https://github.com/jorisperrenet/BachelorThesis/blob/main/report/TUD-report2020.cls">includes</a>
             all the styling I used.
