@@ -1,17 +1,25 @@
-<script>
-  import "../app.postcss";
-  import Header from "./Header.svelte";
+<script lang="ts">
+  const pageTitle = 'Joris Perrenet';
+  const pageDescription = 'My personal website!';
+
+  import "../app.css";
   let now = new Date();
   let year = now.getFullYear();
+
+	let { children } = $props();
 </script>
 
-<div class="flex flex-col min-h-screen bg-gray-100">
-  <Header />
+<svelte:head>
+	<title>{pageTitle}</title>
+	<meta name="description" content={pageDescription} />
+	<meta name="theme-color" content="#fff" />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={pageTitle} />
+	<meta property="og:description" content={pageDescription} />
+</svelte:head>
 
-  <main class="flex flex-col flex-1">
-    <slot />
-  </main>
-
+<div class="flex h-screen flex-col">
+  {@render children()}
   <footer>
     <p class="text-center py-2">
       &copy {year} - Joris Perrenet
