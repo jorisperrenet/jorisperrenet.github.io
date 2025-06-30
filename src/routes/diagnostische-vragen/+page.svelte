@@ -290,11 +290,11 @@
   // AI voorbeelden per vak
   const aiVoorbeelden = {
     'Wiskunde': {
-      vraag: 'Wat is de oplossing van de vergelijking 2x + 3 = 11?',
-      antwoorden: ['A) x = 4', 'B) x = 7', 'C) x = 14', 'D) x = 8'],
-      juist: 'A) x = 4',
-      uitleg: 'Veel leerlingen maken de fout dat ze beide kanten door 2 delen voordat ze 3 aftrekken (optie B), of ze tellen 2x + 3 + 11 op (optie C).',
-      prompt: 'Maak een diagnostische vraag over het oplossen van eenvoudige lineaire vergelijkingen voor 2e klas VWO. Zorg dat de foute antwoordopties veelvoorkomende misvattingen weergeven: het verkeerd toepassen van bewerkingsvolgorde en het verwarren van optellen/aftrekken bij het "overzetten" van termen.'
+      vraag: 'Ontbind in factoren: 4x² + 5x − 6.',
+      antwoorden: ['A) (2x-1)(2x+6)', 'B) (x+2)(4x-3)', 'C) (4x+6)(x-1)', 'D) (x-2)(4x+3)'],
+      juist: 'B) (x+2)(4x-3)',
+      uitleg: 'Leerlingen maken vaak fouten bij deze opgave omdat ze de termen verkeerd combineren of het voorteken bij het middenterm verkeerd toepassen bij het zoeken naar twee getallen die zowel optellen tot 5 als vermenigvuldigen tot -6.',
+      prompt: 'Maak een lastige diagnostische vraag over ontbinden in factoren voor 2e klas VWO. Zorg dat de foute antwoordopties veelvoorkomende misvattingen weergeven: het verkeerd toepassen van bewerkingsvolgorde en het verwarren van optellen/aftrekken bij het "overzetten" van termen.'
     },
     'Nederlands': {
       vraag: 'Welke zin bevat een bijvoeglijk naamwoord?',
@@ -435,11 +435,11 @@
 
   <!-- Introductie in dropdown -->
   <div class="mb-4">
-    <button class="w-full text-left px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 font-semibold" on:click={() => showIntro = !showIntro}>
+    <button class="w-full text-left px-4 py-2 bg-orange-100 rounded hover:bg-orange-200 font-semibold" on:click={() => showIntro = !showIntro}>
       Wat zijn diagnostische vragen en waarom zijn ze handig?
     </button>
     {#if showIntro}
-      <div class="p-4 bg-gray-50 border-l-4 border-gray-300 mt-2 rounded">
+      <div class="p-4 bg-gray-50 border-l-4 border-orange-300 mt-2 rounded">
         <p>
           Diagnostische vragen zijn strategisch ontworpen meerkeuzevragen om misvattingen bij leerlingen te constateren. Craig Barton, auteur van "How I Wish I'd Taught Maths"<sup><a href={refLink(17)} target="_blank" class="">[17]</a></sup><sup><a href={refLink(18)} target="_blank" class="">[18]</a></sup><sup><a href={refLink(19)} target="_blank" class="">[19]</a></sup>, omschrijft een diagnostische vraag als een vraag die zo is ontworpen dat hij de docent helpt een geïnformeerde beslissing te nemen over wat de beste vervolgstap is in de les.<sup><a href={refLink(14)} target="_blank" class="text-blue-600">[14]</a></sup>
         </p>
@@ -634,7 +634,7 @@
     {/if}
   </div>
 
-  <h2 class="text-2xl font-bold mt-8 mb-4">Waar vind je diagnostische vragen per vakgebied?</h2>
+  <h2 class="text-2xl font-bold mt-8 mb-4">Diagnostische vragen per vakgebied</h2>
   <p class="mb-4 text-gray-700">
     Selecteer een vakgebied om bronnen te zien van collecties met diagnostische vragen, of gebruik AI om ze zelf te genereren.
   </p>
