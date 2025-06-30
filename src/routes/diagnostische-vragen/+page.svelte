@@ -148,6 +148,7 @@
             { naam: 'Third Space Learning – Maths Diagnostic Questions (Engels)', url: 'https://thirdspacelearning.com/secondary-resources/diagnostic-questions/' },
             { naam: 'STEM Learning – Best Evidence Science Teaching (Engels)', url: 'https://www.stem.org.uk/secondary/resources/collections/maths' },
             { naam: 'Wikiwijs – wiskunde (Nederlands)', url: 'https://zoeken.wikiwijs.nl/search/diagnostische+vragen+wiskunde' },
+            { naam: 'Euclides - diagnostische vragen in de wiskundeles (Nederlands)', url: 'https://nvon.nl/uploads/Diagnostische%20vragen/Artikel%20Euclides%20diagnostische%20vragen.pdf' },
           ]
         },
         {
