@@ -1,12 +1,12 @@
 <script lang="ts">
-  const pageTitle = 'Joris Perrenet';
-  const pageDescription = 'My personal website!';
+  const pageTitle = 'Padel';
+  const pageDescription = 'Create Padel Schedule!';
 
-  import "../app.css";
+  import "../../app.css";
   let now = new Date();
   let year = now.getFullYear();
 
-	let { children } = $props();
+  let { children } = $props();
 </script>
 
 <svelte:head>
@@ -18,10 +18,13 @@
 	<meta property="og:description" content={pageDescription} />
 </svelte:head>
 
-<div class="flex h-screen flex-col">
-  {@render children()}
+<div class="flex h-screen flex-col" style="background-color: #121519; color: #000000">
+  <main class="flex-1">
+    {@render children()}
+  </main>
+
   <footer>
-    <p class="text-center py-2">
+    <p class="text-center py-2" style="background-color: #121519; color: #ebedf0">
       &copy {year} - Joris Perrenet
     </p>
   </footer>

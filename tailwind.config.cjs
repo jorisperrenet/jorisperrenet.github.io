@@ -28,7 +28,7 @@ const config = {
       },
       borderRadius: {
         '4xl': '2rem',
-      }
+      },
     },
     fontSize: {
       sm: '0.8rem',

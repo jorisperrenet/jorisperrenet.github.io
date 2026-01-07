@@ -1,9 +1,8 @@
 <script lang="ts">
-  import StartPage from '../components/main.svelte';
   const pageTitle = 'Joris Perrenet';
   const pageDescription = 'My personal website!';
 
-  import "../app.css";
+  import "../../app.css";
   let now = new Date();
   let year = now.getFullYear();
 
@@ -20,8 +19,8 @@
 </svelte:head>
 
 <div class="flex h-screen flex-col">
-  <main class="flex w-full flex-col px-4">
-    <StartPage />
+  <main class="flex-1">
+    {@render children()}
   </main>
 
   <footer>
