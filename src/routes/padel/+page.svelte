@@ -401,7 +401,7 @@
 
 
 <div class="bg-default p-6">
-  <div class="mx-auto max-w-7xl">
+    <div style="--players: {players.length}" class="mx-auto max-w-[clamp(700px,calc(700px+65px*var(--players)),1700px)]">
 
     <!-- ===================== -->
     <!-- Top row: Players + Controls -->
