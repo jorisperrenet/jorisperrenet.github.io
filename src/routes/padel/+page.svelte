@@ -416,7 +416,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-sm">
               <!-- Number of Rounds -->
               <div class="flex flex-col items-center">
-                <label class="mb-1 text-sm font-medium text-on-block">Rounds</label>
+                <div class="mb-1 text-sm font-medium text-on-block">Rounds</div>
                 <div class="flex items-center space-x-2">
                   <button
                     class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
@@ -432,7 +432,7 @@
 
               <!-- Number of Courts -->
               <div class="flex flex-col items-center">
-                <label class="mb-1 text-sm font-medium text-on-block">Courts</label>
+                <div class="mb-1 text-sm font-medium text-on-block">Courts</div>
                 <div class="flex items-center space-x-2">
                   <button
                     class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
@@ -448,7 +448,7 @@
 
               <!-- Start Time -->
               <div class="flex flex-col items-center">
-                <label class="mb-1 text-sm font-medium text-on-block">Start Time</label>
+                <div class="mb-1 text-sm font-medium text-on-block">Start Time</div>
                 <div class="flex items-center space-x-2">
                   <button
                     class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
@@ -458,7 +458,7 @@
                     type="time"
                     bind:value={startTime}
                     on:blur={() => startTime = normalizeTime30(startTime)}
-                    class="w-24 text-center rounded px-2 py-1 text-sm bg-block text-on-block [&::-webkit-calendar-picker-indicator]:hidden"
+                    class="w-24 text-center rounded px-2 py-1 bg-block text-on-block font-bold [&::-webkit-calendar-picker-indicator]:hidden"
                   />
                   <button
                     class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
@@ -469,7 +469,8 @@
 
               <!-- Total Duration -->
               <div class="flex flex-col items-center">
-                <label class="mb-1 text-sm font-medium text-on-block">Duration</label>
+                <div class="mb-1 text-sm font-medium text-on-block">Duration</div>
+
                 <div class="flex items-center space-x-2">
                   <button
                     class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
