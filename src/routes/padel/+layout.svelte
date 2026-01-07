@@ -29,3 +29,10 @@
     </p>
   </footer>
 </div>
+
+<style>
+  :global(html, body) {
+      background-color: #121519;
+      color: #000000;
+  }
+</style>
