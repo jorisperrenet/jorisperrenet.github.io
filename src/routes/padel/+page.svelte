@@ -592,7 +592,7 @@
 
         <div class="overflow-x-auto">
           <!-- Original layout -->
-          <table class="min-w-full border-primary border-2 text-xs">
+          <table class="min-w-full border-primary border-2 text-xs text-on-primary">
             <thead class="bg-primary">
               <tr>
                 <th class="border-primary border-2 px-1 py-1 text-center">Round</th>
@@ -645,32 +645,6 @@
       <!-- ===================== -->
       <div class="mt-6 rounded-xl bg-block p-4 shadow">
         <h2 class="mb-4 text-lg font-semibold text-on-block">Player Statistics</h2>
-
-        <ul class="mt-1 ml-4 text-xs text-gray-500 list-disc">
-          <li>Maximum difference in player waits: {stats.maxWaitDiff}</li>
-          <li>Maximum difference in teammate counts: {stats.maxTeammateDiff}</li>
-          <li>Maximum difference in opponent counts: {stats.maxOpponentDiff}</li>
-          <li>Maximum difference in total encounters (teammate + opponent): {stats.maxEncounterDiff}</li>
-        </ul>
-
-        {#if optimality==0}
-          <p class="m-4 text-xs text-white">
-            These values are proven to be optimal!!!
-          </p>
-        {:else if optimality==1}
-          <p class="m-4 text-xs text-white">
-            These values aren't optimal, it may be that the total encounter difference could be reduced to 1!
-          </p>
-        {:else if optimality==2}
-          <p class="m-4 text-xs text-white">
-            These values are NOT optimal, it may be that the total opponent difference could be reduced to 1! Otherwise, things are optimal.
-          </p>
-        {:else if optimality==3}
-          <p class="m-4 text-xs text-white">
-            These values are NOT optimal, it may be that the total opponent difference could be reduced to 1! Also, maybe the total encounter difference could be reduced to 1!
-          </p>
-        {/if}
-
         <table class="min-w-full text-xs">
           <thead class="">
             <tr>
@@ -750,6 +724,31 @@
             {/each}
           </tbody>
         </table>
+
+        {#if optimality==0}
+          <p class="m-4 text-xs text-white">
+            These values are proven to be optimal!!!
+          </p>
+        {:else if optimality==1}
+          <p class="m-4 text-xs text-white">
+            These values aren't optimal, it may be that the total encounter difference could be reduced to 1!
+          </p>
+        {:else if optimality==2}
+          <p class="m-4 text-xs text-white">
+            These values are NOT optimal, it may be that the total opponent difference could be reduced to 1! Otherwise, things are optimal.
+          </p>
+        {:else if optimality==3}
+          <p class="m-4 text-xs text-white">
+            These values are NOT optimal, it may be that the total opponent difference could be reduced to 1! Also, maybe the total encounter difference could be reduced to 1!
+          </p>
+        {/if}
+
+        <ul class="mt-1 ml-4 text-xs text-gray-500 list-disc">
+          <li>Maximum difference in player waits: {stats.maxWaitDiff}</li>
+          <li>Maximum difference in teammate counts: {stats.maxTeammateDiff}</li>
+          <li>Maximum difference in opponent counts: {stats.maxOpponentDiff}</li>
+          <li>Maximum difference in total encounters (teammate + opponent): {stats.maxEncounterDiff}</li>
+        </ul>
       </div>
 
     </div>
@@ -786,6 +785,6 @@
   }
 
   .text-on-primary {
-    color: #303640;
+    color: #000000;
   }
 </style>
