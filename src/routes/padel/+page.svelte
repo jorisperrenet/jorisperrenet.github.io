@@ -606,11 +606,11 @@
 
             <tbody>
               {#each schedule as round, roundIndex}
-                <tr class="bg-schedule">
+                <tr class="bg-block text-on-block">
                   <td class="border-primary border-2 text-center font-medium w-28">
                     Round {roundIndex + 1}
                     {#if roundTimes[roundIndex]}
-                      <div class="text-[10px] text-gray-500">
+                      <div class="text-[10px] text-gray-400">
                         {roundTimes[roundIndex].start} – {roundTimes[roundIndex].end}
                       </div>
                     {/if}
@@ -619,13 +619,13 @@
                   {#each round as match}
                     <td class="border-primary border-2 text-center">
                       <div class="flex flex-col gap-0">
-                        <div class="rounded px-1 font-semibold">
+                        <div class="rounded px-1">
                           {players[match[0][0]]?.name}
                           &
                           {players[match[0][1]]?.name}
                         </div>
-                        <div class="text-[10px] text-gray-500 leading-none">vs</div>
-                        <div class="rounded px-1 font-semibold">
+                        <div class="text-[10px] text-gray-400 leading-none">vs</div>
+                        <div class="rounded px-1">
                           {players[match[1][0]]?.name}
                           &
                           {players[match[1][1]]?.name}
