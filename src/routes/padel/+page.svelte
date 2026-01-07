@@ -458,7 +458,7 @@
                     type="time"
                     bind:value={startTime}
                     on:blur={() => startTime = normalizeTime30(startTime)}
-                    class="w-24 text-center rounded px-2 py-1 bg-block text-on-block font-bold [&::-webkit-calendar-picker-indicator]:hidden"
+                    class="w-24 text-center rounded px-2 py-1 bg-block text-on-block font-semibold [&::-webkit-calendar-picker-indicator]:hidden"
                   />
                   <button
                     class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
