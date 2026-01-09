@@ -16,18 +16,22 @@
     transposeTable = estimatedWidth < window.innerWidth;
   }
 
-  let players = Array.from({ length: 10 }, (_, i) => ({
-    id: i,
-    name: `Player${i}`
-  }));
+  var players, startTime, durationMinutes, numRounds, numCourts, optimality, numPlayers;
+  function reset() {
+    players = Array.from({ length: 10 }, (_, i) => ({
+        id: i,
+        name: `Player${i}`
+      }));
 
-  let startTime = '15:00'; // HH:MM
-  let durationMinutes = 90;   // HH:MM
+    startTime = '15:00'; // HH:MM
+    durationMinutes = 90;   // HH:MM
 
-  let numRounds = 9;
-  let numCourts = 2;
-  let optimality = 3;
-  let numPlayers = players.length;
+    numRounds = 9;
+    numCourts = 2;
+    optimality = 3;
+    numPlayers = players.length;
+  }
+  reset();
 
   // Flag to prevent saving before state is loaded
   let stateLoaded = false;
@@ -824,6 +828,16 @@
                       UNKNOWN SCHEDULE OPTIMALITY
                   </p>
               {/if}
+            </div>
+
+            <div class="w-full flex justify-end">
+              <button
+                on:click={reset}
+                class="rounded border border-primary px-1 text-[0.6rem] font-medium text-on-block
+                       hover:opacity-80 transition"
+              >
+                Reset state
+              </button>
             </div>
           </div>
         </div>
