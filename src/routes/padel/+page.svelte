@@ -21,7 +21,7 @@
     name: `Player${i}`
   }));
 
-  let startTime = '18:00'; // HH:MM
+  let startTime = '15:00'; // HH:MM
   let durationMinutes = 90;   // HH:MM
 
   let numRounds = 9;
@@ -501,8 +501,11 @@
    * ----------------------------- */
   $: numPlayers = players.length;
 
-  let prevPlayers = numPlayers;
-  $: if (numPlayers !== prevPlayers) {
+  let prevPlayers = -1;
+  $: if (stateLoaded) {
+    prevPlayers = numPlayers;
+  }
+  $: if (stateLoaded && numPlayers !== prevPlayers && prevPlayers != -1) {
     numCourts = Math.floor(numPlayers / 4);
     prevPlayers = numPlayers;
   }
