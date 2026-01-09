@@ -849,6 +849,7 @@
         <div class="grid gap-2 grid-cols-[repeat(auto-fit,minmax(100px,1fr))]">
           {#each players as player, index}
             <div
+              role="listitem"
               draggable="true"
               on:dragstart={() => onDragStart(index)}
               on:dragover|preventDefault
