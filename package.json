@@ -36,5 +36,9 @@
   "type": "module",
   "peerDependencies": {
     "svelte": "^3.x || ^4.x"
+  },
+  "dependencies": {
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.0.0"
   }
 }

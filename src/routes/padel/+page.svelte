@@ -1,9 +1,12 @@
 <script>
   import sols from '../../lib/solved.txt?raw';
   import { onMount } from 'svelte';
+  import jsPDF from 'jspdf';
 
   const STORAGE_KEY = 'padel-planner-state';
+  const RANDOMIZE_KEY = STORAGE_KEY + '-randomize';
   const MAX_PLAYERS = 20;
+  let randomizeCounter = 0;
 
   let transposeTable = false;
   let removedPlayers = [];
@@ -70,12 +73,301 @@
       } catch {}
     }
 
+    const rawRandomize = localStorage.getItem(RANDOMIZE_KEY);
+    if (rawRandomize) {
+      const parsed = Number(rawRandomize);
+      if (!Number.isNaN(parsed)) {
+        randomizeCounter = parsed;
+      }
+    }
+
     // After restoring, allow saving
     stateLoaded = true;
 
     updateTableOrientation();
     window.addEventListener('resize', updateTableOrientation);
   });
+
+
+  function exportSchedulePDF() {
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'pt',
+      format: 'a4'
+    });
+
+    const margin = 40;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    let y = margin;
+
+    /* =========================
+     * TITLE
+     * ========================= */
+    pdf.setFontSize(16);
+    pdf.text('Padel Tournament Schedule', margin, y);
+    y += 24;
+
+    pdf.setFontSize(10);
+    pdf.text(
+      `Players: ${players.length}   Courts: ${numCourts}   Rounds: ${numRounds}`,
+      margin,
+      y
+    );
+    y += 20;
+
+    /* =========================
+     * SCHEDULE TABLE
+     * ========================= */
+    const roundColWidthSchedule = 80;
+    const maxCourts = Math.min(numCourts, 5);
+    const scoreColWidth = maxCourts >= 5 ? 45 : maxCourts >= 4 ? 70 : 100; // narrower for 5 courts
+    const baseCourtColWidth = (pageWidth - margin * 2 - roundColWidthSchedule - maxCourts * scoreColWidth) / maxCourts; // slightly narrower score column
+    const rowHeight = 40;
+
+    // HEADER
+    pdf.setFontSize(10);
+    pdf.setDrawColor(0);
+    pdf.setLineWidth(1);
+
+    pdf.rect(margin, y, roundColWidthSchedule, rowHeight);
+    pdf.text('Round', margin + roundColWidthSchedule / 2, y + 15, { align: 'center' });
+
+    for (let c = 0; c < maxCourts; c++) {
+      const x = margin + roundColWidthSchedule + c * (baseCourtColWidth + scoreColWidth);
+
+      pdf.rect(x, y, baseCourtColWidth, rowHeight);
+      pdf.text(`Court ${c + 1}`, x + baseCourtColWidth / 2, y + 15, { align: 'center' });
+
+      pdf.rect(x + baseCourtColWidth, y, scoreColWidth, rowHeight);
+      pdf.text('Score', x + baseCourtColWidth + scoreColWidth / 2, y + 15, { align: 'center' });
+    }
+    y += rowHeight;
+
+    // TABLE BODY
+    schedule.forEach((round, roundIndex) => {
+      if (y + rowHeight > pageHeight - margin) {
+        pdf.addPage();
+        y = margin;
+      }
+
+      // Round column
+      pdf.rect(margin, y, roundColWidthSchedule, rowHeight);
+      const roundLabel = `Round ${roundIndex + 1}`;
+      let roundTimeText = '';
+      if (roundTimes?.[roundIndex]) {
+        const rt = roundTimes[roundIndex];
+        roundTimeText =
+          typeof rt === 'string'
+            ? rt
+            : rt?.time || `${rt?.start || ''} - ${rt?.end || ''}`;
+      }
+      pdf.setFontSize(10);
+      pdf.text(`${roundLabel}\n${roundTimeText}`, margin + roundColWidthSchedule / 2 - 2, y + rowHeight / 2 - 2, { align: 'center' });
+
+      round.forEach((match, courtIndex) => {
+        if (courtIndex >= maxCourts) return;
+
+        const x = margin + roundColWidthSchedule + courtIndex * (baseCourtColWidth + scoreColWidth);
+
+        // Draw court cell
+        pdf.rect(x, y, baseCourtColWidth, rowHeight);
+
+        const team1 = `${players[match[0][0]].name} & ${players[match[0][1]].name}`;
+        const team2 = `${players[match[1][0]].name} & ${players[match[1][1]].name}`;
+
+        // Horizontal centering within the court cell
+        const centerX = x + baseCourtColWidth / 2;
+
+        let f = 11;
+        pdf.setFontSize(f);
+        while (pdf.getTextWidth(team1) >= baseCourtColWidth - 12) {
+            f = f <= 1 ? f / 2 : f - 1;
+            pdf.setFontSize(f);
+        }
+        pdf.text(team1, centerX - 5, y + 13, { align: 'center' });
+
+        pdf.setFontSize(7);
+        pdf.text('vs', centerX, y + 22, { align: 'center' }); // slightly lower than before
+
+        f = 11;
+        pdf.setFontSize(f);
+        while (pdf.getTextWidth(team2) >= baseCourtColWidth - 12) {
+            f = f <= 1 ? f / 2 : f - 1;
+            pdf.setFontSize(f);
+        }
+        pdf.text(team2, centerX - 5, y + 34, { align: 'center' });
+
+        // Score box
+        pdf.rect(x + baseCourtColWidth, y, scoreColWidth, rowHeight);
+      });
+
+      y += rowHeight;
+    });
+
+    /* =========================
+     * PLAYER SCORE SHEET
+     * ========================= */
+    pdf.addPage();
+    y = margin;
+
+    // Title
+    pdf.setFontSize(16);
+    pdf.text('Player Score Sheet', margin, y);
+    y += 24;
+
+    // Table settings
+    const headerHeight = 28;
+    const rowHeightScore = players.length >= 19 ? 22 : 24; // fits 20 players
+
+    // Fixed widths for last 3 columns
+    const totalColWidth = 50;
+    const matchesColWidth = 50;
+    const scoreColWidthPDF = 50;
+
+    // Base font for names
+    const baseFontSize = 10;
+    pdf.setFontSize(baseFontSize);
+
+    // Determine max width of names
+    let nameColWidthPDF = 0;
+    players.forEach(p => {
+      const w = pdf.getTextWidth(p.name)*1.3 + 5; // padding
+      if (w > nameColWidthPDF) nameColWidthPDF = w;
+    });
+
+    // Calculate remaining width for rounds
+    let remainingWidth = pageWidth - margin * 2 - nameColWidthPDF - totalColWidth - matchesColWidth - scoreColWidthPDF;
+    let roundColWidth = remainingWidth / numRounds;
+
+    // Reduce name font if needed
+    let nameFontSize = baseFontSize;
+    if (roundColWidth < 40) {
+      roundColWidth = 40;
+      nameColWidthPDF = pageWidth - margin * 2 - roundColWidth * numRounds - totalColWidth - matchesColWidth - scoreColWidthPDF;
+
+      const maxTextWidth = nameColWidthPDF - 8; // padding
+      let longestNameWidth = 0;
+      pdf.setFontSize(baseFontSize);
+      players.forEach(p => {
+        const w = pdf.getTextWidth(p.name) * 1.3;
+        if (w > longestNameWidth) longestNameWidth = w;
+      });
+
+      if (longestNameWidth > maxTextWidth) {
+        nameFontSize = baseFontSize * (maxTextWidth / longestNameWidth);
+      }
+    }
+
+    // HEADER
+    let x = margin;
+    const numCols = 1 + numRounds + 3; // Name + rounds + Total + Matches + Score
+    const headers = [
+      'Name',
+      ...Array.from({ length: numRounds }, (_, i) => `Round ${i + 1}`),
+      'Total',
+      'Matches',
+      'Score'
+    ];
+
+    headers.forEach((h, idx) => {
+      let w;
+      if (idx === 0) w = nameColWidthPDF;
+      else if (idx === numCols - 3) w = totalColWidth;
+      else if (idx === numCols - 2) w = matchesColWidth;
+      else if (idx === numCols - 1) w = scoreColWidthPDF;
+      else w = roundColWidth;
+
+      pdf.setLineWidth(0.2);
+      pdf.rect(x, y, w, headerHeight);
+      pdf.setFontSize(8);
+      pdf.text(h, x + w / 2 - 2, y + headerHeight / 2 + 4, { align: 'center' });
+      x += w;
+    });
+    y += headerHeight;
+
+    // Calculate matches per player
+    const playerMatches = players.map((p, i) => {
+      let total = 0;
+      const rounds = Array(numRounds).fill('✗'); // ✗ for byes
+      schedule.forEach(round => {
+        round.forEach(match => {
+          const allPlayers = [...match[0], ...match[1]];
+          if (allPlayers.includes(i)) {
+            total++;
+            rounds[schedule.indexOf(round)] = ''; // played this round
+          }
+        });
+      });
+      return { total, rounds };
+    });
+
+    // PLAYER ROWS
+    players.forEach((player, i) => {
+      x = margin;
+
+      // Name cell
+      pdf.setFontSize(nameFontSize);
+      pdf.rect(x, y, nameColWidthPDF, rowHeightScore);
+      pdf.text(player.name, x + nameColWidthPDF / 2 - 2, y + rowHeightScore / 2 + 4, { align: 'center' });
+      x += nameColWidthPDF;
+
+      // Round cells + Total + Matches + Score
+      const rowCells = [
+        ...playerMatches[i].rounds,
+        '',
+        playerMatches[i].total.toString(),
+        ''
+      ];
+      pdf.setFontSize(10);
+
+      rowCells.forEach((cell, idx) => {
+        let w;
+        const colIdx = idx + 1; // after name
+        if (colIdx === numCols - 3) w = totalColWidth;
+        else if (colIdx === numCols - 2) w = matchesColWidth;
+        else if (colIdx === numCols - 1) w = scoreColWidthPDF;
+        else w = roundColWidth;
+
+        pdf.setLineWidth(0.2);
+        pdf.rect(x, y, w, rowHeightScore);
+
+        if (cell === '✗') {
+          // Big visible cross
+          pdf.setLineWidth(1.5);
+          pdf.line(x + 2, y + 2, x + w - 2, y + rowHeightScore - 2);
+          pdf.line(x + w - 2, y + 2, x + 2, y + rowHeightScore - 2);
+          pdf.setLineWidth(0.2);
+        } else {
+          pdf.text(cell, x + w / 2, y + rowHeightScore / 2 + 4, { align: 'center' });
+        }
+
+        x += w;
+      });
+
+      y += rowHeightScore;
+    });
+
+    // Draw thicker border around Total → Matches → Score block
+    let borderX = margin + nameColWidthPDF + roundColWidth * numRounds;
+    let borderY = margin + 24 + headerHeight;
+    let borderWidth = totalColWidth + matchesColWidth + scoreColWidthPDF;
+    let borderHeight = rowHeightScore * players.length;
+    pdf.setLineWidth(2);
+    pdf.rect(borderX, borderY, borderWidth, borderHeight);
+
+    // Header thicker border
+    borderY = margin + 24;
+    borderHeight = headerHeight;
+    pdf.rect(borderX, borderY, borderWidth, borderHeight);
+
+
+    pdf.save('padel-schedule.pdf');
+  }
+
+
+
+
 
   // Only save state after it has been loaded
   $: if (stateLoaded) {
@@ -140,7 +432,11 @@
     }
     return arr;
   }
-  $: seed = numPlayers * 10000 + numCourts * 100 + numRounds;
+  $: seed = numPlayers * 10000 + numCourts * 100 + numRounds + randomizeCounter;
+
+  $: if (stateLoaded) {
+    localStorage.setItem(RANDOMIZE_KEY, String(randomizeCounter));
+  }
 
   // -----------------------------
   // Shuffle the schedule
@@ -215,10 +511,12 @@
     s => s.players === numPlayers && s.courts === numCourts && s.rounds === numRounds
   );
 
-  $: schedule = selectedSolution?.schedule ?? [];
-  $: if (schedule && schedule.length) {
-    schedule = shuffleSchedule(schedule, seed);
-  }
+  $: baseSchedule = selectedSolution?.schedule ?? [];
+
+  $: schedule =
+    baseSchedule && baseSchedule.length
+      ? shuffleSchedule(baseSchedule, seed)
+      : [];
 
   $: optimality = selectedSolution.optimality;
 
@@ -586,9 +884,28 @@
       <!-- Schedule (BELOW) -->
       <!-- ===================== -->
       <div class="mt-6 rounded-xl bg-block p-4">
-        <h2 class="mb-4 text-xl font-semibold text-on-block">
-          Schedule
-        </h2>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold text-on-block">
+            Schedule
+          </h2>
+
+          <div class="flex gap-2">
+            <button
+              on:click={() => randomizeCounter += 1}
+              class="rounded bg-primary px-3 py-1 text-xs font-semibold text-on-primary"
+            >
+              Randomize
+            </button>
+
+            <button
+              on:click={exportSchedulePDF}
+              class="rounded bg-primary px-3 py-1 text-xs font-semibold text-on-primary"
+            >
+              Export PDF
+            </button>
+          </div>
+        </div>
+
 
         <div class="overflow-x-auto">
           <!-- Original layout -->
@@ -643,87 +960,89 @@
       <!-- ===================== -->
       <!-- Player Statistics Table -->
       <!-- ===================== -->
-      <div class="mt-6 rounded-xl bg-block p-4 shadow">
+      <div class="mt-6 rounded-xl bg-block p-4">
         <h2 class="mb-4 text-lg font-semibold text-on-block">Player Statistics</h2>
-        <table class="min-w-full text-xs">
-          <thead class="">
-            <tr>
-              <th class="py-1"></th>
-              <th class="px-2 py-1"></th>
-              <th class="px-2 py-1 bg-primary text-on-primary border-2 border-primary">Teammates</th>
-              <th class="px-2 py-1 bg-primary text-on-primary border-2 border-primary">Opponents</th>
-            </tr>
-          </thead>
+        <div class="overflow-x-auto min-w-0">
+            <table class="min-w-full text-xs">
+              <thead class="">
+                <tr>
+                  <th class="py-1"></th>
+                  <th class="px-2 py-1"></th>
+                  <th class="px-2 py-1 bg-primary text-on-primary border-2 border-primary">Teammates</th>
+                  <th class="px-2 py-1 bg-primary text-on-primary border-2 border-primary">Opponents</th>
+                </tr>
+              </thead>
 
-          <!-- Names row for vertical text -->
-          <tbody>
-            <tr class="bg-block">
-              <th class="border-2 border-primary bg-primary text-on-primary">Player</th>
-              <th class="border-2 border-primary bg-primary text-on-primary">Waits</th>
+              <!-- Names row for vertical text -->
+              <tbody>
+                <tr class="bg-block">
+                  <th class="border-2 border-primary bg-primary text-on-primary">Player</th>
+                  <th class="border-2 border-primary bg-primary text-on-primary">Waits</th>
 
-              <!-- Teammate names, vertical -->
-              <td class="border-2 border-primary px-2.5 py-1">
-                <div class="flex justify-between">
-                  {#each players as teammate}
-                    <div class="text-[10px] text-on-block whitespace-nowrap"
-                         style="writing-mode: vertical-rl; transform: rotate(180deg);">
-                      {teammate.name}
+                  <!-- Teammate names, vertical -->
+                  <td class="border-2 border-primary py-1">
+                    <div class="grid grid-flow-col auto-cols-fr px-1.5 justify-items-center">
+                      {#each players as teammate}
+                        <div class="text-[10px] text-on-block whitespace-nowrap"
+                             style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                          {teammate.name}
+                        </div>
+                      {/each}
                     </div>
-                  {/each}
-                </div>
-              </td>
+                  </td>
 
-              <!-- Opponent names, vertical -->
-              <td class="border-2 border-primary px-2.5 py-1">
-                <div class="flex justify-between">
-                  {#each players as opponent}
-                    <div class="text-[10px] text-on-block whitespace-nowrap"
-                         style="writing-mode: vertical-rl; transform: rotate(180deg);">
-                      {opponent.name}
+                  <!-- Opponent names, vertical -->
+                  <td class="border-2 border-primary py-1">
+                    <div class="grid grid-flow-col auto-cols-fr px-1.5 justify-items-center">
+                      {#each players as opponent}
+                        <div class="text-[10px] text-on-block whitespace-nowrap"
+                             style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                          {opponent.name}
+                        </div>
+                      {/each}
                     </div>
-                  {/each}
-                </div>
-              </td>
-            </tr>
-          </tbody>
+                  </td>
+                </tr>
+              </tbody>
 
-          <tbody>
-            {#each players as player, i}
-              <tr class="bg-block">
-                <td class="border-2 border-primary px-2 py-1 font-medium text-on-block">{player.name}</td>
-                <td class="border-2 border-primary px-2 py-1 text-center text-on-block">{stats.byes[i]}</td>
+              <tbody>
+                {#each players as player, i}
+                  <tr class="bg-block">
+                    <td class="border-2 border-primary px-2 py-1 font-medium text-on-block">{player.name}</td>
+                    <td class="border-2 border-primary px-2 py-1 text-center text-on-block">{stats.byes[i]}</td>
 
-                <!-- Teammates counts -->
-                <td class="border-2 border-primary px-4 py-1 text-center text-on-block text-[10px]">
-                  <div class="flex justify-between">
-                    {#each players as teammate, j}
-                      {#if i === j}
-                        <div>-</div>
-                      {:else}
-                        <div>{stats.teammates[i][j]}</div>
-                      {/if}
-                    {/each}
-                  </div>
-                </td>
-
-                <!-- Opponents counts -->
-                <td class="border-2 border-primary px-4 py-1 text-center text-on-block text-[10px]">
-                  <div class="flex justify-between">
-                    {#each players as opponent, j}
-                      <div>
-                        {#if i === j}
-                          -
-                        {:else}
-                          {stats.opponents[i][j]}
-                        {/if}
+                    <!-- Teammates counts -->
+                    <td class="border-2 border-primary text-on-block text-[10px]">
+                      <div class="grid grid-flow-col auto-cols-fr gap-3 px-3 place-items-center">
+                        {#each players as teammate, j}
+                          {#if i === j}
+                            <div>-</div>
+                          {:else}
+                            <div>{stats.teammates[i][j]}</div>
+                          {/if}
+                        {/each}
                       </div>
-                    {/each}
-                  </div>
-                </td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
+                    </td>
+
+                    <!-- Opponents counts -->
+                    <td class="border-2 border-primary text-on-block text-[10px]">
+                      <div class="grid grid-flow-col auto-cols-fr gap-3 px-3 place-items-center">
+                        {#each players as opponent, j}
+                          <div>
+                            {#if i === j}
+                              -
+                            {:else}
+                              {stats.opponents[i][j]}
+                            {/if}
+                          </div>
+                        {/each}
+                      </div>
+                    </td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+        </div>
 
         {#if optimality==0}
           <p class="m-4 text-xs text-white">
@@ -766,10 +1085,6 @@
 
   .border-primary {
     border-color: #40b6d4;
-  }
-
-  .bg-schedule {
-    background-color: #eee;
   }
 
   .bg-default {
