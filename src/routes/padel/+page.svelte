@@ -170,7 +170,7 @@
             : rt?.time || `${rt?.start || ''} - ${rt?.end || ''}`;
       }
       pdf.setFontSize(10);
-      pdf.text(`${roundLabel}\n${roundTimeText}`, margin + roundColWidthSchedule / 2 - 2, y + rowHeight / 2 - 2, { align: 'center' });
+      pdf.text(`${roundLabel}\n${roundTimeText}`, margin + roundColWidthSchedule / 2, y + rowHeight / 2, { align: 'center' });
 
       round.forEach((match, courtIndex) => {
         if (courtIndex >= maxCourts) return;
@@ -192,7 +192,7 @@
             f = f <= 1 ? f / 2 : f - 1;
             pdf.setFontSize(f);
         }
-        pdf.text(team1, centerX - 4, y + 13, { align: 'center' });
+        pdf.text(team1, centerX, y + 13, { align: 'center' });
 
         pdf.setFontSize(7);
         pdf.text('vs', centerX, y + 22, { align: 'center' }); // slightly lower than before
@@ -203,7 +203,7 @@
             f = f <= 1 ? f / 2 : f - 1;
             pdf.setFontSize(f);
         }
-        pdf.text(team2, centerX - 4, y + 34, { align: 'center' });
+        pdf.text(team2, centerX, y + 34, { align: 'center' });
 
         // Score box
         pdf.rect(x + baseCourtColWidth, y, scoreColWidth, rowHeight);
@@ -288,7 +288,7 @@
       pdf.setLineWidth(0.2);
       pdf.rect(x, y, w, headerHeight);
       pdf.setFontSize(8);
-      pdf.text(h, x + w / 2 - 2, y + headerHeight / 2 + 4, { align: 'center' });
+      pdf.text(h, x + w / 2, y + headerHeight / 2 + 4, { align: 'center' });
       x += w;
     });
     y += headerHeight;
@@ -316,7 +316,7 @@
       // Name cell
       pdf.setFontSize(nameFontSize);
       pdf.rect(x, y, nameColWidthPDF, rowHeightScore);
-      pdf.text(player.name, x + nameColWidthPDF / 2 - 2, y + rowHeightScore / 2 + 4, { align: 'center' });
+      pdf.text(player.name, x + nameColWidthPDF / 2, y + rowHeightScore / 2 + 4, { align: 'center' });
       x += nameColWidthPDF;
 
       // Round cells + Total + Matches + Score
