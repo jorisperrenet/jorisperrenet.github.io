@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
   import jsPDF from 'jspdf';
 
+
   const STORAGE_KEY = 'padel-planner-state';
   const RANDOMIZE_KEY = STORAGE_KEY + '-randomize';
   const MAX_PLAYERS = 20;
@@ -93,12 +94,14 @@
   });
 
 
-  function exportSchedulePDF() {
+  async function exportSchedulePDF() {
     const pdf = new jsPDF({
       orientation: 'landscape',
       unit: 'pt',
       format: 'a4'
     });
+
+    pdf.setFont('Helvetica');
 
     const margin = 40;
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -189,7 +192,7 @@
             f = f <= 1 ? f / 2 : f - 1;
             pdf.setFontSize(f);
         }
-        pdf.text(team1, centerX - 5, y + 13, { align: 'center' });
+        pdf.text(team1, centerX - 4, y + 13, { align: 'center' });
 
         pdf.setFontSize(7);
         pdf.text('vs', centerX, y + 22, { align: 'center' }); // slightly lower than before
@@ -200,7 +203,7 @@
             f = f <= 1 ? f / 2 : f - 1;
             pdf.setFontSize(f);
         }
-        pdf.text(team2, centerX - 5, y + 34, { align: 'center' });
+        pdf.text(team2, centerX - 4, y + 34, { align: 'center' });
 
         // Score box
         pdf.rect(x + baseCourtColWidth, y, scoreColWidth, rowHeight);
