@@ -4,7 +4,7 @@
   // ── Types & constants ──────────────────────────────────────────────
   type CellValue = 'O' | 'X' | '.'
   type Constraint = '=' | 'x' | '.'
-  type Difficulty = 'medium' | 'hard' | 'extreme' | 'extreme+'
+  type Difficulty = 'medium' | 'hard' | 'extreme' | 'medium-nohint' | 'hard-nohint' | 'extreme-nohint'
   type Domain = CellValue[]
 
   interface Puzzle {
@@ -23,19 +23,26 @@
   interface DifficultyConfig {
     minRemoved: number
     maxRemoved: number
+    noHints?: boolean
+    minScore?: number
+    maxScore?: number
+    allowBacktracking?: boolean
   }
 
   const GRID_SIZE = 6
   const CELLS_PER_SYMBOL = 3
 
   const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
-    medium:     { minRemoved: 24, maxRemoved: 30 },
-    hard:       { minRemoved: 28, maxRemoved: 34 },
-    extreme:    { minRemoved: 32, maxRemoved: 36 },
-    'extreme+': { minRemoved: 28, maxRemoved: 36 },
+    medium:          { minRemoved: 24, maxRemoved: 30 },
+    hard:            { minRemoved: 28, maxRemoved: 34 },
+    extreme:         { minRemoved: 32, maxRemoved: 36 },
+    'medium-nohint': { minRemoved: 24, maxRemoved: 32, noHints: true, minScore: 80, maxScore: 120, allowBacktracking: false },
+    'hard-nohint':   { minRemoved: 26, maxRemoved: 36, noHints: true, minScore: 120, maxScore: Infinity, allowBacktracking: false },
+    'extreme-nohint':{ minRemoved: 28, maxRemoved: 36, noHints: true, minScore: 150, maxScore: Infinity, allowBacktracking: true },
   }
 
-  const DIFFICULTIES: Difficulty[] = ['medium', 'hard', 'extreme', 'extreme+']
+  const HINT_LEVELS: Difficulty[] = ['medium', 'hard', 'extreme']
+  const NOHINT_LEVELS: Difficulty[] = ['medium-nohint', 'hard-nohint', 'extreme-nohint']
 
   // ── Solver ─────────────────────────────────────────────────────────
   function solve(
@@ -271,21 +278,173 @@
     return true
   }
 
-  // ── Generator ──────────────────────────────────────────────────────
-  function generatePuzzle(difficulty: Difficulty): Puzzle {
-    const config = DIFFICULTY_CONFIG[difficulty]
-    const solution = generateCompleteBoard()
+  // ── Difficulty scorer ──────────────────────────────────────────────
+  // Scores a no-hint puzzle by solving it step-by-step using techniques
+  // in order of difficulty. Each technique is tried before harder ones,
+  // so easy techniques get credit first:
+  //   - Line saturation (3 of one type → fill rest): +1
+  //   - No-three-consecutive (two same adjacent → neighbor forced): +2
+  //   - Line logic (enumerate valid completions per line,
+  //     catches patterns like mms..→mms..s, m....m→ms..sm, m...m.→m...ms):
+  //     weighted by unknowns*2 (more unknowns = harder to enumerate)
+  //   - Backtracking guess (trial and error): +25
+  function scorePuzzleDifficulty(board: CellValue[]): { score: number; needsBacktracking: boolean } {
+    const { hConstraints: hC, vConstraints: vC } = emptyConstraints()
+    const domains: Domain[] = board.map(v => (v === '.' ? ['O', 'X'] : [v]))
+    return _scoreSolve(domains, hC, vC)
+  }
 
-    if (difficulty === 'extreme+') {
-      const { hConstraints, vConstraints } = emptyConstraints()
-      const board = removeCells(solution, hConstraints, vConstraints, config.minRemoved, config.maxRemoved)
-      return { board, solution, hConstraints, vConstraints, difficulty }
+  function _scoreSolve(inputDomains: Domain[], hC: Constraint[][], vC: Constraint[][]): { score: number; needsBacktracking: boolean } {
+    const domains = inputDomains.map(d => [...d])
+    const { ok, score: propScore } = propagateWithScoring(domains)
+    if (!ok) return { score: Infinity, needsBacktracking: false }
+
+    let bestIdx = -1, bestSize = Infinity
+    for (let i = 0; i < domains.length; i++) {
+      if (domains[i].length > 1 && domains[i].length < bestSize) {
+        bestSize = domains[i].length; bestIdx = i
+      }
+    }
+    if (bestIdx === -1) return { score: propScore, needsBacktracking: false }
+
+    for (const value of domains[bestIdx]) {
+      const newDomains = domains.map(d => [...d])
+      newDomains[bestIdx] = [value]
+      const sub = _scoreSolve(newDomains, hC, vC)
+      if (sub.score < Infinity) return { score: propScore + 25 + sub.score, needsBacktracking: true }
+    }
+    return { score: Infinity, needsBacktracking: false }
+  }
+
+  // For a single line (row or column), enumerate all valid completions
+  // respecting the count constraint (3 of each) and no-three-consecutive.
+  // Any cell that has only one possible value across all completions is forced.
+  // This catches patterns like:
+  //   mms... → mms..s  (ssm completion blocked by three-consecutive)
+  //   m....m → ms..sm  (positions 1,4 forced)
+  //   m...m. → m...ms  (position 5 forced)
+  function applyLineLogic(
+    domains: Domain[], lineIdx: number, isRow: boolean,
+  ): { ok: boolean; changed: boolean; unknowns: number } {
+    let changed = false
+    const indices: number[] = []
+    for (let k = 0; k < GRID_SIZE; k++) {
+      indices.push(isRow ? lineIdx * GRID_SIZE + k : k * GRID_SIZE + lineIdx)
     }
 
-    const { hConstraints, vConstraints } = placeAllConstraints(solution)
-    const board = removeCells(solution, hConstraints, vConstraints, config.minRemoved, config.maxRemoved)
-    pruneConstraints(board, hConstraints, vConstraints)
-    return { board, solution, hConstraints, vConstraints, difficulty }
+    const values: (CellValue | null)[] = indices.map(i =>
+      domains[i].length === 1 ? domains[i][0] : null,
+    )
+
+    let placedO = 0, placedX = 0
+    for (const v of values) {
+      if (v === 'O') placedO++
+      else if (v === 'X') placedX++
+    }
+
+    const needO = CELLS_PER_SYMBOL - placedO
+    const needX = CELLS_PER_SYMBOL - placedX
+    const unknowns: number[] = []
+    for (let k = 0; k < GRID_SIZE; k++) {
+      if (values[k] === null) unknowns.push(k)
+    }
+
+    if (unknowns.length === 0) return { ok: true, changed, unknowns: 0 }
+    if (needO < 0 || needX < 0 || needO + needX !== unknowns.length) return { ok: false, changed, unknowns: unknowns.length }
+
+    const canBeO = new Array(GRID_SIZE).fill(false)
+    const canBeX = new Array(GRID_SIZE).fill(false)
+
+    const oChoices = combinations(unknowns, needO)
+    let validCount = 0
+
+    for (const oSet of oChoices) {
+      const oSetAsSet = new Set(oSet)
+      const line: CellValue[] = values.map((v, k) =>
+        v !== null ? v : (oSetAsSet.has(k) ? 'O' : 'X'),
+      ) as CellValue[]
+
+      let valid = true
+      for (let k = 0; k <= GRID_SIZE - 3; k++) {
+        if (line[k] === line[k + 1] && line[k] === line[k + 2]) {
+          valid = false; break
+        }
+      }
+
+      if (valid) {
+        validCount++
+        for (const k of unknowns) {
+          if (line[k] === 'O') canBeO[k] = true
+          else canBeX[k] = true
+        }
+      }
+    }
+
+    if (validCount === 0) return { ok: false, changed, unknowns: unknowns.length }
+
+    for (const k of unknowns) {
+      const idx = indices[k]
+      if (canBeO[k] && !canBeX[k]) {
+        if (domains[idx].length > 1) { domains[idx] = ['O']; changed = true }
+      } else if (canBeX[k] && !canBeO[k]) {
+        if (domains[idx].length > 1) { domains[idx] = ['X']; changed = true }
+      } else if (!canBeO[k] && !canBeX[k]) {
+        return { ok: false, changed, unknowns: unknowns.length }
+      }
+    }
+
+    return { ok: true, changed, unknowns: unknowns.length }
+  }
+
+  function propagateWithScoring(domains: Domain[]): { ok: boolean; score: number } {
+    let score = 0
+    let changed = true
+
+    while (changed) {
+      changed = false
+
+      // Technique 1: Line saturation (weight 1) — easiest
+      for (let i = 0; i < GRID_SIZE; i++) {
+        const rr = saturateLine(domains, i, true)
+        if (!rr.ok) return { ok: false, score: Infinity }
+        if (rr.changed) { score += 1; changed = true }
+        const cr = saturateLine(domains, i, false)
+        if (!cr.ok) return { ok: false, score: Infinity }
+        if (cr.changed) { score += 1; changed = true }
+      }
+
+      // Technique 2: No-three-consecutive (weight 2) — moderate
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c <= GRID_SIZE - 3; c++) {
+          const res = applyNoThreeConsecutive(domains, r * GRID_SIZE + c, r * GRID_SIZE + c + 1, r * GRID_SIZE + c + 2)
+          if (!res.ok) return { ok: false, score: Infinity }
+          if (res.changed) { score += 2; changed = true }
+        }
+      }
+      for (let c = 0; c < GRID_SIZE; c++) {
+        for (let r = 0; r <= GRID_SIZE - 3; r++) {
+          const res = applyNoThreeConsecutive(domains, r * GRID_SIZE + c, (r + 1) * GRID_SIZE + c, (r + 2) * GRID_SIZE + c)
+          if (!res.ok) return { ok: false, score: Infinity }
+          if (res.changed) { score += 2; changed = true }
+        }
+      }
+
+      // Technique 3: Line logic (weight unknowns*3) — advanced
+      // Weight scales with unknowns: more unknowns = more completions to enumerate
+      for (let i = 0; i < GRID_SIZE; i++) {
+        const rr = applyLineLogic(domains, i, true)
+        if (!rr.ok) return { ok: false, score: Infinity }
+        if (rr.changed) { score += rr.unknowns * 3; changed = true }
+        const cr = applyLineLogic(domains, i, false)
+        if (!cr.ok) return { ok: false, score: Infinity }
+        if (cr.changed) { score += cr.unknowns * 3; changed = true }
+      }
+
+      for (let idx = 0; idx < domains.length; idx++) {
+        if (domains[idx].length === 0) return { ok: false, score: Infinity }
+      }
+    }
+    return { ok: true, score }
   }
 
   function emptyConstraints() {
@@ -296,6 +455,39 @@
       vConstraints: Array.from({ length: GRID_SIZE - 1 }, () =>
         new Array(GRID_SIZE).fill('.') as Constraint[],
       ),
+    }
+  }
+
+  // ── Generator ──────────────────────────────────────────────────────
+  function generatePuzzle(difficulty: Difficulty): Puzzle {
+    const config = DIFFICULTY_CONFIG[difficulty]
+
+    if (config.noHints) {
+      return generateNoHintPuzzle(difficulty, config)
+    }
+
+    const solution = generateCompleteBoard()
+    const { hConstraints, vConstraints } = placeAllConstraints(solution)
+    const board = removeCells(solution, hConstraints, vConstraints, config.minRemoved, config.maxRemoved)
+    pruneConstraints(board, hConstraints, vConstraints)
+    return { board, solution, hConstraints, vConstraints, difficulty }
+  }
+
+  function generateNoHintPuzzle(difficulty: Difficulty, config: DifficultyConfig): Puzzle {
+    const minScore = config.minScore ?? 0
+    const maxScore = config.maxScore ?? Infinity
+    const allowBT = config.allowBacktracking ?? true
+
+    while (true) {
+      const solution = generateCompleteBoard()
+      const { hConstraints, vConstraints } = emptyConstraints()
+      const board = removeCells(solution, hConstraints, vConstraints, config.minRemoved, config.maxRemoved)
+      const { score, needsBacktracking } = scorePuzzleDifficulty(board)
+
+      if (!allowBT && needsBacktracking) continue
+      if (score >= minScore && score <= maxScore) {
+        return { board, solution, hConstraints, vConstraints, difficulty }
+      }
     }
   }
 
@@ -533,8 +725,14 @@
     moves = []
   }
 
+  function difficultyLabel(d: Difficulty): string {
+    const level = d.replace('-nohint', '')
+    const variant = d.includes('nohint') ? ' (no hints)' : ''
+    return `${level}${variant}`
+  }
+
   async function share() {
-    const text = `I completed a Tango puzzle in ${formattedTime()}!`
+    const text = `I completed a ${difficultyLabel(difficulty)} Tango puzzle in ${formattedTime()}!`
     if (navigator.share) {
       try { await navigator.share({ text }) } catch {}
     } else {
@@ -560,28 +758,40 @@
   <div class="flex flex-col items-center gap-5 w-full max-w-sm mx-auto px-4">
     <h1 class="text-3xl font-bold text-stone-800 tracking-tight">Tango</h1>
 
-    <!-- Difficulty selector + Timer -->
-    <div class="flex items-center gap-4 w-full justify-between">
-      <div class="flex gap-1 bg-stone-100 p-1 rounded-xl">
-        {#each DIFFICULTIES as option}
-          <button
-            class="px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition-all cursor-pointer
-              {difficulty === option
-                ? 'bg-white text-stone-800 shadow-sm'
-                : 'text-stone-500 hover:text-stone-700'}"
-            onclick={() => newGame(option)}
-          >
-            {option}
-          </button>
-        {/each}
+    <!-- Difficulty selector -->
+    <div class="flex flex-col gap-1.5 items-center">
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-semibold text-stone-400 uppercase tracking-wider w-12 shrink-0">hints</span>
+        <div class="flex gap-0.5 bg-stone-100 p-0.5 rounded-lg">
+          {#each HINT_LEVELS as option}
+            <button
+              class="px-3 py-1 rounded-md text-xs font-medium capitalize transition-all cursor-pointer
+                {difficulty === option
+                  ? 'bg-white text-stone-800 shadow-sm'
+                  : 'text-stone-500 hover:text-stone-700'}"
+              onclick={() => newGame(option)}
+            >
+              {option}
+            </button>
+          {/each}
+        </div>
       </div>
 
-      <div class="flex items-center gap-2 px-4 py-2 bg-white border border-stone-200 rounded-full text-sm font-mono text-stone-600">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>
-        {formattedTime()}
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-semibold text-stone-400 uppercase tracking-wider w-12 shrink-0">plain</span>
+        <div class="flex gap-0.5 bg-stone-100 p-0.5 rounded-lg">
+          {#each NOHINT_LEVELS as option}
+            <button
+              class="px-3 py-1 rounded-md text-xs font-medium capitalize transition-all cursor-pointer
+                {difficulty === option
+                  ? 'bg-white text-stone-800 shadow-sm'
+                  : 'text-stone-500 hover:text-stone-700'}"
+              onclick={() => newGame(option)}
+            >
+              {option.replace('-nohint', '')}
+            </button>
+          {/each}
+        </div>
       </div>
     </div>
 
@@ -654,6 +864,15 @@
         Clear
       </button>
     </div>
+
+    <!-- Timer -->
+    <div class="flex items-center gap-2 px-4 py-2 bg-white border border-stone-200 rounded-full text-sm font-mono text-stone-600">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+      {formattedTime()}
+    </div>
   </div>
 
   <!-- Win modal -->
@@ -681,3 +900,7 @@
     </div>
   {/if}
 </main>
+
+<footer class="text-center py-4 text-xs text-gray-500">
+  This puzzle is inspired by Tango on LinkedIn. All rights belong to their respective owners.
+</footer>
