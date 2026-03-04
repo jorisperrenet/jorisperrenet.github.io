@@ -33,11 +33,11 @@
   const CELLS_PER_SYMBOL = 3
 
   const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
-    medium:          { minRemoved: 24, maxRemoved: 30 },
-    hard:            { minRemoved: 28, maxRemoved: 34 },
+    medium:          { minRemoved: 24, maxRemoved: 30, minScore: 150, allowBacktracking: false },
+    hard:            { minRemoved: 28, maxRemoved: 34, minScore: 230, allowBacktracking: false },
     extreme:         { minRemoved: 32, maxRemoved: 36 },
-    'medium-nohint': { minRemoved: 24, maxRemoved: 32, noHints: true, minScore: 80, maxScore: 120, allowBacktracking: false },
-    'hard-nohint':   { minRemoved: 26, maxRemoved: 36, noHints: true, minScore: 120, maxScore: Infinity, allowBacktracking: false },
+    'medium-nohint': { minRemoved: 24, maxRemoved: 32, noHints: true, minScore: 80, maxScore: 115, allowBacktracking: false },
+    'hard-nohint':   { minRemoved: 26, maxRemoved: 36, noHints: true, minScore: 115, maxScore: Infinity, allowBacktracking: false },
     'extreme-nohint':{ minRemoved: 28, maxRemoved: 36, noHints: true, minScore: 150, maxScore: Infinity, allowBacktracking: true },
   }
 
@@ -279,24 +279,28 @@
   }
 
   // ── Difficulty scorer ──────────────────────────────────────────────
-  // Scores a no-hint puzzle by solving it step-by-step using techniques
-  // in order of difficulty. Each technique is tried before harder ones,
-  // so easy techniques get credit first:
-  //   - Line saturation (3 of one type → fill rest): +1
-  //   - No-three-consecutive (two same adjacent → neighbor forced): +2
-  //   - Line logic (enumerate valid completions per line,
-  //     catches patterns like mms..→mms..s, m....m→ms..sm, m...m.→m...ms):
-  //     weighted by unknowns*2 (more unknowns = harder to enumerate)
-  //   - Backtracking guess (trial and error): +25
-  function scorePuzzleDifficulty(board: CellValue[]): { score: number; needsBacktracking: boolean } {
-    const { hConstraints: hC, vConstraints: vC } = emptyConstraints()
+  // Score = sum of line-force pattern difficulties.
+  // Free techniques (don't add to score): edge constraints, saturation,
+  // no-three-consecutive. Scored technique: line logic (enumerate valid
+  // completions considering hints), weighted by unknowns^2.
+  // Backtracking adds +25 per guess.
+  function scorePuzzleDifficulty(
+    board: CellValue[],
+    hC?: Constraint[][],
+    vC?: Constraint[][],
+  ): { score: number; needsBacktracking: boolean } {
+    if (!hC || !vC) {
+      const empty = emptyConstraints()
+      hC = empty.hConstraints
+      vC = empty.vConstraints
+    }
     const domains: Domain[] = board.map(v => (v === '.' ? ['O', 'X'] : [v]))
     return _scoreSolve(domains, hC, vC)
   }
 
   function _scoreSolve(inputDomains: Domain[], hC: Constraint[][], vC: Constraint[][]): { score: number; needsBacktracking: boolean } {
     const domains = inputDomains.map(d => [...d])
-    const { ok, score: propScore } = propagateWithScoring(domains)
+    const { ok, score: propScore } = propagateWithScoring(domains, hC, vC)
     if (!ok) return { score: Infinity, needsBacktracking: false }
 
     let bestIdx = -1, bestSize = Infinity
@@ -325,11 +329,21 @@
   //   m...m. → m...ms  (position 5 forced)
   function applyLineLogic(
     domains: Domain[], lineIdx: number, isRow: boolean,
-  ): { ok: boolean; changed: boolean; unknowns: number } {
+    hConstraints: Constraint[][], vConstraints: Constraint[][],
+  ): { ok: boolean; changed: boolean; unknowns: number; hasHints: boolean } {
     let changed = false
     const indices: number[] = []
     for (let k = 0; k < GRID_SIZE; k++) {
       indices.push(isRow ? lineIdx * GRID_SIZE + k : k * GRID_SIZE + lineIdx)
+    }
+
+    // Get edge constraints along this line
+    const lineEdges: Constraint[] = []
+    let hasHints = false
+    for (let k = 0; k < GRID_SIZE - 1; k++) {
+      const e = isRow ? hConstraints[lineIdx][k] : vConstraints[k][lineIdx]
+      lineEdges.push(e)
+      if (e !== '.') hasHints = true
     }
 
     const values: (CellValue | null)[] = indices.map(i =>
@@ -349,8 +363,8 @@
       if (values[k] === null) unknowns.push(k)
     }
 
-    if (unknowns.length === 0) return { ok: true, changed, unknowns: 0 }
-    if (needO < 0 || needX < 0 || needO + needX !== unknowns.length) return { ok: false, changed, unknowns: unknowns.length }
+    if (unknowns.length === 0) return { ok: true, changed, unknowns: 0, hasHints }
+    if (needO < 0 || needX < 0 || needO + needX !== unknowns.length) return { ok: false, changed, unknowns: unknowns.length, hasHints }
 
     const canBeO = new Array(GRID_SIZE).fill(false)
     const canBeX = new Array(GRID_SIZE).fill(false)
@@ -371,6 +385,15 @@
         }
       }
 
+      // Check edge constraints along the line
+      if (valid) {
+        for (let k = 0; k < GRID_SIZE - 1; k++) {
+          const con = lineEdges[k]
+          if (con === '=' && line[k] !== line[k + 1]) { valid = false; break }
+          if (con === 'x' && line[k] === line[k + 1]) { valid = false; break }
+        }
+      }
+
       if (valid) {
         validCount++
         for (const k of unknowns) {
@@ -380,7 +403,7 @@
       }
     }
 
-    if (validCount === 0) return { ok: false, changed, unknowns: unknowns.length }
+    if (validCount === 0) return { ok: false, changed, unknowns: unknowns.length, hasHints }
 
     for (const k of unknowns) {
       const idx = indices[k]
@@ -389,55 +412,81 @@
       } else if (canBeX[k] && !canBeO[k]) {
         if (domains[idx].length > 1) { domains[idx] = ['X']; changed = true }
       } else if (!canBeO[k] && !canBeX[k]) {
-        return { ok: false, changed, unknowns: unknowns.length }
+        return { ok: false, changed, unknowns: unknowns.length, hasHints }
       }
     }
 
-    return { ok: true, changed, unknowns: unknowns.length }
+    return { ok: true, changed, unknowns: unknowns.length, hasHints }
   }
 
-  function propagateWithScoring(domains: Domain[]): { ok: boolean; score: number } {
+  function propagateWithScoring(
+    domains: Domain[],
+    hConstraints: Constraint[][],
+    vConstraints: Constraint[][],
+  ): { ok: boolean; score: number } {
     let score = 0
     let changed = true
 
     while (changed) {
       changed = false
 
-      // Technique 1: Line saturation (weight 1) — easiest
+      // Free techniques: edge constraints, saturation, no-three-consecutive
+      // These don't contribute to difficulty score
+
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE - 1; c++) {
+          const con = hConstraints[r][c]
+          if (con === '.') continue
+          const i = r * GRID_SIZE + c
+          const res = applyEdgeConstraint(domains, i, i + 1, con)
+          if (!res.ok) return { ok: false, score: Infinity }
+          if (res.changed) changed = true
+        }
+      }
+      for (let r = 0; r < GRID_SIZE - 1; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          const con = vConstraints[r][c]
+          if (con === '.') continue
+          const i = r * GRID_SIZE + c
+          const res = applyEdgeConstraint(domains, i, i + GRID_SIZE, con)
+          if (!res.ok) return { ok: false, score: Infinity }
+          if (res.changed) changed = true
+        }
+      }
+
       for (let i = 0; i < GRID_SIZE; i++) {
         const rr = saturateLine(domains, i, true)
         if (!rr.ok) return { ok: false, score: Infinity }
-        if (rr.changed) { score += 1; changed = true }
+        if (rr.changed) changed = true
         const cr = saturateLine(domains, i, false)
         if (!cr.ok) return { ok: false, score: Infinity }
-        if (cr.changed) { score += 1; changed = true }
+        if (cr.changed) changed = true
       }
 
-      // Technique 2: No-three-consecutive (weight 2) — moderate
       for (let r = 0; r < GRID_SIZE; r++) {
         for (let c = 0; c <= GRID_SIZE - 3; c++) {
           const res = applyNoThreeConsecutive(domains, r * GRID_SIZE + c, r * GRID_SIZE + c + 1, r * GRID_SIZE + c + 2)
           if (!res.ok) return { ok: false, score: Infinity }
-          if (res.changed) { score += 2; changed = true }
+          if (res.changed) changed = true
         }
       }
       for (let c = 0; c < GRID_SIZE; c++) {
         for (let r = 0; r <= GRID_SIZE - 3; r++) {
           const res = applyNoThreeConsecutive(domains, r * GRID_SIZE + c, (r + 1) * GRID_SIZE + c, (r + 2) * GRID_SIZE + c)
           if (!res.ok) return { ok: false, score: Infinity }
-          if (res.changed) { score += 2; changed = true }
+          if (res.changed) changed = true
         }
       }
 
-      // Technique 3: Line logic (weight unknowns*3) — advanced
-      // Weight scales with unknowns: more unknowns = more completions to enumerate
+      // Line logic — the only scored technique
+      // Score = unknowns^2 per line force, +50% if hints were involved
       for (let i = 0; i < GRID_SIZE; i++) {
-        const rr = applyLineLogic(domains, i, true)
+        const rr = applyLineLogic(domains, i, true, hConstraints, vConstraints)
         if (!rr.ok) return { ok: false, score: Infinity }
-        if (rr.changed) { score += rr.unknowns * 3; changed = true }
-        const cr = applyLineLogic(domains, i, false)
+        if (rr.changed) { score += Math.ceil(rr.unknowns * rr.unknowns * (rr.hasHints ? 1.5 : 1)); changed = true }
+        const cr = applyLineLogic(domains, i, false, hConstraints, vConstraints)
         if (!cr.ok) return { ok: false, score: Infinity }
-        if (cr.changed) { score += cr.unknowns * 3; changed = true }
+        if (cr.changed) { score += Math.ceil(cr.unknowns * cr.unknowns * (cr.hasHints ? 1.5 : 1)); changed = true }
       }
 
       for (let idx = 0; idx < domains.length; idx++) {
@@ -466,11 +515,22 @@
       return generateNoHintPuzzle(difficulty, config)
     }
 
-    const solution = generateCompleteBoard()
-    const { hConstraints, vConstraints } = placeAllConstraints(solution)
-    const board = removeCells(solution, hConstraints, vConstraints, config.minRemoved, config.maxRemoved)
-    pruneConstraints(board, hConstraints, vConstraints)
-    return { board, solution, hConstraints, vConstraints, difficulty }
+    const minScore = config.minScore ?? 0
+    const maxScore = config.maxScore ?? Infinity
+    const allowBT = config.allowBacktracking ?? true
+
+    while (true) {
+      const solution = generateCompleteBoard()
+      const { hConstraints, vConstraints } = placeAllConstraints(solution)
+      const board = removeCells(solution, hConstraints, vConstraints, config.minRemoved, config.maxRemoved)
+      pruneConstraints(board, hConstraints, vConstraints)
+
+      const { score, needsBacktracking } = scorePuzzleDifficulty(board, hConstraints, vConstraints)
+      if (!allowBT && needsBacktracking) continue
+      if (score >= minScore && score <= maxScore) {
+        return { board, solution, hConstraints, vConstraints, difficulty }
+      }
+    }
   }
 
   function generateNoHintPuzzle(difficulty: Difficulty, config: DifficultyConfig): Puzzle {
@@ -685,6 +745,7 @@
 
   function newGame(d: Difficulty) {
     difficulty = d
+    won = false
     loading = true
     stopTimer()
 
@@ -695,7 +756,6 @@
       hConstraints = puzzle.hConstraints
       vConstraints = puzzle.vConstraints
       moves = []
-      won = false
       elapsed = 0
       loading = false
       startTimer()
@@ -732,12 +792,102 @@
   }
 
   async function share() {
-    const text = `I completed a ${difficultyLabel(difficulty)} Tango puzzle in ${formattedTime()}!`
-    if (navigator.share) {
-      try { await navigator.share({ text }) } catch {}
-    } else {
-      await navigator.clipboard.writeText(text)
+    const size = 600
+    const pad = 12
+    const cellSize = (size - pad * 2) / GRID_SIZE
+    const gap = 4
+    const inner = cellSize - gap
+
+    const canvas = document.createElement('canvas')
+    canvas.width = size
+    canvas.height = size
+    const ctx = canvas.getContext('2d')!
+
+    // Background
+    ctx.fillStyle = '#e7e5e4' // stone-200
+    ctx.beginPath()
+    ctx.roundRect(0, 0, size, size, 16)
+    ctx.fill()
+
+    for (let r = 0; r < GRID_SIZE; r++) {
+      for (let c = 0; c < GRID_SIZE; c++) {
+        const x = pad + c * cellSize + gap / 2
+        const y = pad + r * cellSize + gap / 2
+        const val = board[r * GRID_SIZE + c]
+
+        // Cell background
+        ctx.fillStyle = locked[r * GRID_SIZE + c] ? '#f5f5f4' : '#ffffff'
+        ctx.beginPath()
+        ctx.roundRect(x, y, inner, inner, 4)
+        ctx.fill()
+
+        // Symbol
+        const cx = x + inner / 2
+        const cy = y + inner / 2
+        const radius = inner * 0.3
+        if (val === 'O') {
+          ctx.fillStyle = '#fbbf24' // amber-400
+          ctx.beginPath()
+          ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+          ctx.fill()
+        } else if (val === 'X') {
+          ctx.fillStyle = '#818cf8' // indigo-400
+          ctx.beginPath()
+          // Crescent: full circle clipped by overlapping circle
+          ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.fillStyle = locked[r * GRID_SIZE + c] ? '#f5f5f4' : '#ffffff'
+          ctx.beginPath()
+          ctx.arc(cx + radius * 0.4, cy - radius * 0.2, radius * 0.85, 0, Math.PI * 2)
+          ctx.fill()
+        }
+
+        // Horizontal constraint badge
+        if (c < GRID_SIZE - 1 && hConstraints[r][c] !== '.') {
+          const bx = x + inner + gap / 2
+          const by = cy
+          ctx.fillStyle = '#e7e5e4'
+          ctx.beginPath()
+          ctx.arc(bx, by, 10, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.fillStyle = '#78716c' // stone-500
+          ctx.font = 'bold 12px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(hConstraints[r][c], bx, by)
+        }
+
+        // Vertical constraint badge
+        if (r < GRID_SIZE - 1 && vConstraints[r][c] !== '.') {
+          const bx = cx
+          const by = y + inner + gap / 2
+          ctx.fillStyle = '#e7e5e4'
+          ctx.beginPath()
+          ctx.arc(bx, by, 10, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.fillStyle = '#78716c'
+          ctx.font = 'bold 12px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(vConstraints[r][c], bx, by)
+        }
+      }
     }
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return
+      const file = new File([blob], 'tango.png', { type: 'image/png' })
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        try { await navigator.share({ files: [file] }) } catch {}
+      } else {
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'tango.png'
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+    }, 'image/png')
   }
 
   function handleCellClick(e: MouseEvent, i: number) {
@@ -754,7 +904,7 @@
   newGame('hard')
 </script>
 
-<main class="min-h-svh bg-stone-50 flex items-start justify-center pt-10 pb-16 select-none">
+<main class="min-h-svh bg-stone-50 flex flex-col items-center pt-10 pb-8 select-none">
   <div class="flex flex-col items-center gap-5 w-full max-w-sm mx-auto px-4">
     <h1 class="text-3xl font-bold text-stone-800 tracking-tight">Tango</h1>
 
@@ -873,7 +1023,12 @@
       </svg>
       {formattedTime()}
     </div>
+
   </div>
+
+  <p class="text-center text-xs text-gray-500 mt-auto pt-8">
+    Inspired by Tango on LinkedIn. All rights belong to their respective owners.
+  </p>
 
   <!-- Win modal -->
   {#if won}
@@ -900,7 +1055,3 @@
     </div>
   {/if}
 </main>
-
-<footer class="text-center py-4 text-xs text-gray-500">
-  This puzzle is inspired by Tango on LinkedIn. All rights belong to their respective owners.
-</footer>
