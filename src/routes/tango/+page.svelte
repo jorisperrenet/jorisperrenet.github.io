@@ -34,11 +34,11 @@
 
   const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
     medium:          { minRemoved: 24, maxRemoved: 30, minScore: 150, allowBacktracking: false },
-    hard:            { minRemoved: 28, maxRemoved: 34, minScore: 230, allowBacktracking: false },
+    hard:            { minRemoved: 28, maxRemoved: 34, minScore: 250, allowBacktracking: false },
     extreme:         { minRemoved: 32, maxRemoved: 36 },
     'medium-nohint': { minRemoved: 24, maxRemoved: 32, noHints: true, minScore: 80, maxScore: 115, allowBacktracking: false },
-    'hard-nohint':   { minRemoved: 26, maxRemoved: 36, noHints: true, minScore: 115, maxScore: Infinity, allowBacktracking: false },
-    'extreme-nohint':{ minRemoved: 28, maxRemoved: 36, noHints: true, minScore: 150, maxScore: Infinity, allowBacktracking: true },
+    'hard-nohint':   { minRemoved: 26, maxRemoved: 36, noHints: true, minScore: 110, maxScore: Infinity, allowBacktracking: false },
+    'extreme-nohint':{ minRemoved: 28, maxRemoved: 36, noHints: true, minScore: 110, maxScore: Infinity, allowBacktracking: true },
   }
 
   const HINT_LEVELS: Difficulty[] = ['medium', 'hard', 'extreme']
