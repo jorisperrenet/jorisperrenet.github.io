@@ -804,7 +804,7 @@
     const ctx = canvas.getContext('2d')!
 
     // Background
-    ctx.fillStyle = '#e7e5e4' // stone-200
+    ctx.fillStyle = '#ddd'
     ctx.beginPath()
     ctx.roundRect(0, 0, size, size, 16)
     ctx.fill()
@@ -816,7 +816,7 @@
         const val = board[r * GRID_SIZE + c]
 
         // Cell background
-        ctx.fillStyle = locked[r * GRID_SIZE + c] ? '#f5f5f4' : '#ffffff'
+        ctx.fillStyle = locked[r * GRID_SIZE + c] ? '#ebe4da' : '#ffffff'
         ctx.beginPath()
         ctx.roundRect(x, y, inner, inner, 4)
         ctx.fill()
@@ -826,17 +826,26 @@
         const cy = y + inner / 2
         const radius = inner * 0.3
         if (val === 'O') {
-          ctx.fillStyle = '#fbbf24' // amber-400
+          ctx.fillStyle = '#ffb31e'
           ctx.beginPath()
           ctx.arc(cx, cy, radius, 0, Math.PI * 2)
           ctx.fill()
+          ctx.strokeStyle = '#cb6c2f'
+          ctx.lineWidth = 2
+          ctx.beginPath()
+          ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+          ctx.stroke()
         } else if (val === 'X') {
-          ctx.fillStyle = '#818cf8' // indigo-400
+          ctx.fillStyle = '#4c8ce6'
           ctx.beginPath()
-          // Crescent: full circle clipped by overlapping circle
           ctx.arc(cx, cy, radius, 0, Math.PI * 2)
           ctx.fill()
-          ctx.fillStyle = locked[r * GRID_SIZE + c] ? '#f5f5f4' : '#ffffff'
+          ctx.strokeStyle = '#1855aa'
+          ctx.lineWidth = 2
+          ctx.beginPath()
+          ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+          ctx.stroke()
+          ctx.fillStyle = locked[r * GRID_SIZE + c] ? '#ebe4da' : '#ffffff'
           ctx.beginPath()
           ctx.arc(cx + radius * 0.4, cy - radius * 0.2, radius * 0.85, 0, Math.PI * 2)
           ctx.fill()
@@ -846,11 +855,11 @@
         if (c < GRID_SIZE - 1 && hConstraints[r][c] !== '.') {
           const bx = x + inner + gap / 2
           const by = cy
-          ctx.fillStyle = '#e7e5e4'
+          ctx.fillStyle = '#eeebe7'
           ctx.beginPath()
-          ctx.arc(bx, by, 10, 0, Math.PI * 2)
+          ctx.roundRect(bx - 9, by - 9, 18, 18, 4)
           ctx.fill()
-          ctx.fillStyle = '#78716c' // stone-500
+          ctx.fillStyle = '#8c724c'
           ctx.font = 'bold 12px sans-serif'
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
@@ -861,11 +870,11 @@
         if (r < GRID_SIZE - 1 && vConstraints[r][c] !== '.') {
           const bx = cx
           const by = y + inner + gap / 2
-          ctx.fillStyle = '#e7e5e4'
+          ctx.fillStyle = '#eeebe7'
           ctx.beginPath()
-          ctx.arc(bx, by, 10, 0, Math.PI * 2)
+          ctx.roundRect(bx - 9, by - 9, 18, 18, 4)
           ctx.fill()
-          ctx.fillStyle = '#78716c'
+          ctx.fillStyle = '#8c724c'
           ctx.font = 'bold 12px sans-serif'
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
@@ -904,8 +913,8 @@
   newGame('hard')
 </script>
 
-<main class="min-h-svh bg-stone-50 flex flex-col items-center pt-10 pb-8 select-none">
-  <div class="flex flex-col items-center gap-5 w-full max-w-sm mx-auto px-4">
+<main class="min-h-svh bg-[#F8FAFD] flex flex-col items-center pt-10 pb-8 select-none">
+  <div class="flex flex-col items-center gap-5 w-full max-w-[28rem] mx-auto px-4">
     <h1 class="text-3xl font-bold text-stone-800 tracking-tight">Tango</h1>
 
     <!-- Difficulty selector -->
@@ -948,45 +957,73 @@
     <!-- Board -->
     <div class="w-full">
       {#if loading}
-        <div class="aspect-square rounded-xl bg-stone-200 p-1 flex items-center justify-center">
+        <div class="aspect-square rounded bg-[#ebe4da] outline outline-1 outline-[#ebe4da] flex items-center justify-center">
           <span class="text-stone-400 text-lg">Generating…</span>
         </div>
       {:else}
-        <div class="grid grid-cols-6 gap-1 bg-stone-200 p-1 rounded-xl aspect-square">
+        <div class="grid grid-cols-6 rounded outline outline-1 outline-[#ebe4da] aspect-square overflow-hidden">
           {#each board as value, i}
             {@const row = Math.floor(i / GRID_SIZE)}
             {@const col = i % GRID_SIZE}
-            <div class="relative">
+            <div class="relative border border-[#ebe4da]
+              {locked[i] ? 'bg-[#eeebe7]' : 'bg-white'}
+              {i === 0 ? 'rounded-tl-[3px]' : i === GRID_SIZE - 1 ? 'rounded-tr-[3px]' : i === GRID_SIZE * (GRID_SIZE - 1) ? 'rounded-bl-[3px]' : i === GRID_SIZE * GRID_SIZE - 1 ? 'rounded-br-[3px]' : ''}">
               <button
-                class="aspect-square w-full flex items-center justify-center rounded-sm transition-colors
-                  {locked[i] ? 'bg-stone-100 cursor-default' : 'bg-white cursor-pointer hover:bg-stone-50 active:bg-stone-100'}"
+                class="aspect-square w-full flex items-center justify-center overflow-hidden
+                  {locked[i] ? 'bg-[#eeebe7] cursor-default' : 'bg-white cursor-pointer'}"
                 onclick={(e) => handleCellClick(e, i)}
                 oncontextmenu={(e) => handleCellContext(e, i)}
               >
                 {#if value === 'O'}
-                  <svg class="w-3/5 h-3/5 text-amber-400 drop-shadow-sm" viewBox="0 0 24 24" fill="currentColor">
-                    <circle cx="12" cy="12" r="10" />
+                  <svg class="w-1/2 h-1/2" viewBox="0 0 31 31" fill="none">
+                    <path d="M29.25 15.5C29.25 23.09 23.09 29.25 15.5 29.25C7.91 29.25 1.75 23.09 1.75 15.5C1.75 7.91 7.91 1.75 15.5 1.75C23.09 1.75 29.25 7.91 29.25 15.5Z" fill="#ffb31e" stroke="#cb6c2f" stroke-width="2" />
                   </svg>
                 {:else if value === 'X'}
-                  <svg class="w-3/5 h-3/5 text-indigo-400 drop-shadow-sm" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                  <svg class="w-1/2 h-1/2" viewBox="0 0 28 28" fill="none">
+                    <defs>
+                      <clipPath id="moon-clip-{i}">
+                        <rect x="0.0976562" y="4.26611" width="24" height="24" rx="12" transform="rotate(-10 0.0976562 4.26611)" fill="white" />
+                      </clipPath>
+                    </defs>
+                    <g clip-path="url(#moon-clip-{i})">
+                      <path d="M8.10583 19.9024C15.2282 18.6466 19.2619 11.9868 17.0757 5.09295C16.8785 4.47115 16.6376 3.86915 16.3574 3.28957C16.3507 3.27584 16.3467 3.26256 16.3446 3.24986C20.5748 4.17473 24.0337 7.5648 24.8316 12.0899C25.8865 18.0727 21.8917 23.778 15.9088 24.8329C11.4675 25.616 7.17692 23.6165 4.82974 20.0826C4.84051 20.0805 4.85231 20.0796 4.86526 20.0804C5.93904 20.1476 7.02621 20.0928 8.10583 19.9024Z" fill="#4c8ce6" stroke="#1855aa" stroke-width="2" />
+                      <circle cx="12" cy="12" r="12" transform="matrix(0.984808 -0.173648 0.302281 0.953219 -11.1387 -1.87585)" fill="none" />
+                    </g>
                   </svg>
                 {/if}
               </button>
 
               {#if col < GRID_SIZE - 1 && hConstraints[row][col] !== '.'}
-                <span class="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 z-10
-                  text-[10px] font-bold text-stone-500 bg-stone-200 rounded-full w-4 h-4
-                  flex items-center justify-center pointer-events-none leading-none">
-                  {hConstraints[row][col]}
+                <span class="absolute top-1/2 right-0 translate-x-[calc(50%+1px)] -translate-y-1/2 z-10
+                  w-[30%] h-[30%] pointer-events-none flex items-center justify-center">
+                  {#if hConstraints[row][col] === '='}
+                    <svg class="w-full h-full" viewBox="0 0 18 18" fill="none">
+                      <rect width="18" height="18" rx="4" fill="white" />
+                      <path d="M14.25 11.65C14.25 12.12 13.87 12.5 13.4 12.5H4.85C4.38 12.5 4 12.12 4 11.65C4 11.18 4.38 10.79 4.85 10.79H13.4C13.87 10.79 14.25 11.18 14.25 11.65ZM14.25 6.85C14.25 7.32 13.87 7.71 13.4 7.71H4.85C4.38 7.71 4 7.32 4 6.85C4 6.38 4.38 6 4.85 6H13.4C13.87 6 14.25 6.38 14.25 6.85Z" fill="#8c724c" />
+                    </svg>
+                  {:else}
+                    <svg class="w-full h-full" viewBox="0 0 18 18" fill="none">
+                      <rect width="18" height="18" rx="4" fill="white" />
+                      <path d="M13.475 5.025C13.185 4.735 12.715 4.735 12.425 5.025L10.03 7.42C9.737 7.713 9.263 7.713 8.97 7.42L6.575 5.025C6.285 4.735 5.815 4.735 5.525 5.025C5.235 5.315 5.235 5.785 5.525 6.075L7.92 8.47C8.213 8.763 8.213 9.237 7.92 9.53L5.525 11.925C5.235 12.215 5.235 12.685 5.525 12.975C5.815 13.265 6.285 13.265 6.575 12.975L8.97 10.58C9.263 10.287 9.737 10.287 10.03 10.58L12.425 12.975C12.715 13.265 13.185 13.265 13.475 12.975C13.765 12.685 13.765 12.215 13.475 11.925L11.08 9.53C10.787 9.237 10.787 8.763 11.08 8.47L13.475 6.075C13.765 5.785 13.765 5.315 13.475 5.025Z" fill="#8c724c" />
+                    </svg>
+                  {/if}
                 </span>
               {/if}
 
               {#if row < GRID_SIZE - 1 && vConstraints[row][col] !== '.'}
-                <span class="absolute bottom-0 left-1/2 translate-y-1/2 -translate-x-1/2 z-10
-                  text-[10px] font-bold text-stone-500 bg-stone-200 rounded-full w-4 h-4
-                  flex items-center justify-center pointer-events-none leading-none">
-                  {vConstraints[row][col]}
+                <span class="absolute bottom-0 left-1/2 translate-y-[calc(50%+1px)] -translate-x-1/2 z-10
+                  w-[30%] h-[30%] pointer-events-none flex items-center justify-center">
+                  {#if vConstraints[row][col] === '='}
+                    <svg class="w-full h-full" viewBox="0 0 18 18" fill="none">
+                      <rect width="18" height="18" rx="4" fill="white" />
+                      <path d="M14.25 11.65C14.25 12.12 13.87 12.5 13.4 12.5H4.85C4.38 12.5 4 12.12 4 11.65C4 11.18 4.38 10.79 4.85 10.79H13.4C13.87 10.79 14.25 11.18 14.25 11.65ZM14.25 6.85C14.25 7.32 13.87 7.71 13.4 7.71H4.85C4.38 7.71 4 7.32 4 6.85C4 6.38 4.38 6 4.85 6H13.4C13.87 6 14.25 6.38 14.25 6.85Z" fill="#8c724c" />
+                    </svg>
+                  {:else}
+                    <svg class="w-full h-full" viewBox="0 0 18 18" fill="none">
+                      <rect width="18" height="18" rx="4" fill="white" />
+                      <path d="M13.475 5.025C13.185 4.735 12.715 4.735 12.425 5.025L10.03 7.42C9.737 7.713 9.263 7.713 8.97 7.42L6.575 5.025C6.285 4.735 5.815 4.735 5.525 5.025C5.235 5.315 5.235 5.785 5.525 6.075L7.92 8.47C8.213 8.763 8.213 9.237 7.92 9.53L5.525 11.925C5.235 12.215 5.235 12.685 5.525 12.975C5.815 13.265 6.285 13.265 6.575 12.975L8.97 10.58C9.263 10.287 9.737 10.287 10.03 10.58L12.425 12.975C12.715 13.265 13.185 13.265 13.475 12.975C13.765 12.685 13.765 12.215 13.475 11.925L11.08 9.53C10.787 9.237 10.787 8.763 11.08 8.47L13.475 6.075C13.765 5.785 13.765 5.315 13.475 5.025Z" fill="#8c724c" />
+                    </svg>
+                  {/if}
                 </span>
               {/if}
             </div>
