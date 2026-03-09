@@ -5,7 +5,6 @@
   type CellValue = 'O' | 'X' | '.'
   type Constraint = '=' | 'x' | '.'
   type Difficulty = 'medium' | 'hard' | 'extreme' | 'medium-nohint' | 'hard-nohint' | 'extreme-nohint'
-  type Domain = CellValue[]
 
   interface Puzzle {
     board: CellValue[]
@@ -21,481 +20,231 @@
   }
 
   interface DifficultyConfig {
-    minRemoved: number
-    maxRemoved: number
     noHints?: boolean
     minScore?: number
     maxScore?: number
-    allowBacktracking?: boolean
   }
 
   const GRID_SIZE = 6
   const CELLS_PER_SYMBOL = 3
+  const DIRECT_SCORE = 10
+  const INDIRECT_SCORE = 30
 
   const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
-    medium:          { minRemoved: 24, maxRemoved: 30, minScore: 150, allowBacktracking: false },
-    hard:            { minRemoved: 28, maxRemoved: 34, minScore: 250, allowBacktracking: false },
-    extreme:         { minRemoved: 32, maxRemoved: 36 },
-    'medium-nohint': { minRemoved: 24, maxRemoved: 32, noHints: true, minScore: 80, maxScore: 115, allowBacktracking: false },
-    'hard-nohint':   { minRemoved: 26, maxRemoved: 36, noHints: true, minScore: 110, maxScore: Infinity, allowBacktracking: false },
-    'extreme-nohint':{ minRemoved: 28, maxRemoved: 36, noHints: true, minScore: 110, maxScore: Infinity, allowBacktracking: true },
+    medium:          { minScore: 10, maxScore: 30 },
+    hard:            { minScore: 100 },
+    extreme:         { minScore: 150 },
+    'medium-nohint': { noHints: true, minScore: 0, maxScore: 0 },
+    'hard-nohint':   { noHints: true, minScore: 30, maxScore: 60 },
+    'extreme-nohint':{ noHints: true, minScore: 60 },
   }
 
   const HINT_LEVELS: Difficulty[] = ['medium', 'hard', 'extreme']
   const NOHINT_LEVELS: Difficulty[] = ['medium-nohint', 'hard-nohint', 'extreme-nohint']
 
-  // ── Solver ─────────────────────────────────────────────────────────
-  function solve(
-    board: CellValue[],
-    hConstraints: Constraint[][],
-    vConstraints: Constraint[][],
-    maxSolutions = 1,
-  ): CellValue[][] {
-    const solutions: CellValue[][] = []
-    const domains: Domain[] = board.map(v => (v === '.' ? ['O', 'X'] : [v]))
-    if (!propagate(domains, hConstraints, vConstraints)) return solutions
-    backtrack(domains, hConstraints, vConstraints, solutions, maxSolutions)
-    return solutions
+  // ── Valid lines ───────────────────────────────────────────────────
+  // All 14 valid arrangements of 3 O's and 3 X's with no three consecutive
+  const VALID_LINES: CellValue[][] = [
+    ['O','O','X','O','X','X'], ['O','O','X','X','O','X'],
+    ['O','X','O','O','X','X'], ['O','X','O','X','O','X'],
+    ['O','X','O','X','X','O'], ['O','X','X','O','O','X'],
+    ['O','X','X','O','X','O'], ['X','O','O','X','O','X'],
+    ['X','O','O','X','X','O'], ['X','O','X','O','O','X'],
+    ['X','O','X','O','X','O'], ['X','O','X','X','O','O'],
+    ['X','X','O','O','X','O'], ['X','X','O','X','O','O'],
+  ]
+
+  // ── Board generation ──────────────────────────────────────────────
+  function generateCompleteBoard(): CellValue[] {
+    const board: CellValue[] = new Array(GRID_SIZE * GRID_SIZE).fill('.')
+    const colCounts = new Array(GRID_SIZE).fill(0)
+
+    function fillRow(row: number): boolean {
+      if (row === GRID_SIZE) return true
+      const order = Array.from({ length: VALID_LINES.length }, (_, i) => i)
+      shuffle(order)
+      for (const li of order) {
+        const line = VALID_LINES[li]
+        let valid = true
+        for (let c = 0; c < GRID_SIZE; c++) {
+          const newO = colCounts[c] + (line[c] === 'O' ? 1 : 0)
+          if (newO > CELLS_PER_SYMBOL || (row + 1 - newO) > CELLS_PER_SYMBOL) { valid = false; break }
+        }
+        if (valid && row >= 2) {
+          for (let c = 0; c < GRID_SIZE; c++) {
+            if (line[c] === board[(row - 1) * GRID_SIZE + c] && line[c] === board[(row - 2) * GRID_SIZE + c]) { valid = false; break }
+          }
+        }
+        if (!valid) continue
+        for (let c = 0; c < GRID_SIZE; c++) {
+          board[row * GRID_SIZE + c] = line[c]
+          if (line[c] === 'O') colCounts[c]++
+        }
+        if (fillRow(row + 1)) return true
+        for (let c = 0; c < GRID_SIZE; c++) {
+          board[row * GRID_SIZE + c] = '.'
+          if (line[c] === 'O') colCounts[c]--
+        }
+      }
+      return false
+    }
+
+    fillRow(0)
+    return board
   }
 
-  function propagate(
-    domains: Domain[],
-    hConstraints: Constraint[][],
-    vConstraints: Constraint[][],
+  // ── Line force classification ─────────────────────────────────────
+  // Score 0: wrong value immediately violates a visible constraint
+  function isFreeForce(
+    cells: CellValue[], hints: Constraint[], pos: number, val: CellValue,
   ): boolean {
+    const wrong: CellValue = val === 'O' ? 'X' : 'O'
+    // Saturation: already 3 of the wrong symbol
+    let count = 0
+    for (const c of cells) if (c === wrong) count++
+    if (count >= CELLS_PER_SYMBOL) return true
+    // Triple/sandwich: wrong value creates three consecutive
+    if (pos >= 2 && cells[pos - 1] === wrong && cells[pos - 2] === wrong) return true
+    if (pos >= 1 && pos <= GRID_SIZE - 2 && cells[pos - 1] === wrong && cells[pos + 1] === wrong) return true
+    if (pos <= GRID_SIZE - 3 && cells[pos + 1] === wrong && cells[pos + 2] === wrong) return true
+    // Hint: adjacent filled cell + hint directly conflicts
+    if (pos > 0 && cells[pos - 1] !== '.') {
+      if (hints[pos - 1] === '=' && cells[pos - 1] !== wrong) return true
+      if (hints[pos - 1] === 'x' && cells[pos - 1] === wrong) return true
+    }
+    if (pos < GRID_SIZE - 1 && cells[pos + 1] !== '.') {
+      if (hints[pos] === '=' && cells[pos + 1] !== wrong) return true
+      if (hints[pos] === 'x' && cells[pos + 1] === wrong) return true
+    }
+    return false
+  }
+
+  // Score DIRECT: wrong value → local propagation → contradiction
+  function isDirectForce(
+    cells: CellValue[], hints: Constraint[], pos: number, correctVal: CellValue,
+  ): boolean {
+    const test: (CellValue | null)[] = cells.map(c => c === '.' ? null : c)
+    test[pos] = correctVal === 'O' ? 'X' : 'O'
     let changed = true
     while (changed) {
       changed = false
-
-      for (let r = 0; r < GRID_SIZE; r++) {
-        for (let c = 0; c < GRID_SIZE - 1; c++) {
-          const con = hConstraints[r][c]
-          if (con === '.') continue
-          const i = r * GRID_SIZE + c
-          const res = applyEdgeConstraint(domains, i, i + 1, con)
-          if (!res.ok) return false
-          if (res.changed) changed = true
+      let oc = 0, xc = 0
+      for (const v of test) { if (v === 'O') oc++; if (v === 'X') xc++ }
+      if (oc > CELLS_PER_SYMBOL || xc > CELLS_PER_SYMBOL) return true
+      if (oc === CELLS_PER_SYMBOL) for (let i = 0; i < GRID_SIZE; i++) if (test[i] === null) { test[i] = 'X'; changed = true }
+      if (xc === CELLS_PER_SYMBOL) for (let i = 0; i < GRID_SIZE; i++) if (test[i] === null) { test[i] = 'O'; changed = true }
+      for (let i = 0; i <= GRID_SIZE - 3; i++) {
+        if (test[i] !== null && test[i] === test[i + 1] && test[i] === test[i + 2]) return true
+      }
+      for (let i = 0; i < GRID_SIZE - 1; i++) {
+        if (test[i] !== null && test[i] === test[i + 1]) {
+          const other: CellValue = test[i]! === 'O' ? 'X' : 'O'
+          if (i > 0 && test[i - 1] === null) { test[i - 1] = other; changed = true }
+          if (i + 2 < GRID_SIZE && test[i + 2] === null) { test[i + 2] = other; changed = true }
         }
       }
-      for (let r = 0; r < GRID_SIZE - 1; r++) {
-        for (let c = 0; c < GRID_SIZE; c++) {
-          const con = vConstraints[r][c]
-          if (con === '.') continue
-          const i = r * GRID_SIZE + c
-          const res = applyEdgeConstraint(domains, i, i + GRID_SIZE, con)
-          if (!res.ok) return false
-          if (res.changed) changed = true
+      for (let i = 0; i <= GRID_SIZE - 3; i++) {
+        if (test[i] !== null && test[i + 2] !== null && test[i] === test[i + 2] && test[i + 1] === null) {
+          test[i + 1] = test[i]! === 'O' ? 'X' : 'O'; changed = true
         }
       }
-
-      for (let i = 0; i < GRID_SIZE; i++) {
-        const rr = saturateLine(domains, i, true)
-        if (!rr.ok) return false
-        if (rr.changed) changed = true
-        const cr = saturateLine(domains, i, false)
-        if (!cr.ok) return false
-        if (cr.changed) changed = true
-      }
-
-      for (let r = 0; r < GRID_SIZE; r++) {
-        for (let c = 0; c <= GRID_SIZE - 3; c++) {
-          const res = applyNoThreeConsecutive(domains, r * GRID_SIZE + c, r * GRID_SIZE + c + 1, r * GRID_SIZE + c + 2)
-          if (!res.ok) return false
-          if (res.changed) changed = true
-        }
-      }
-      for (let c = 0; c < GRID_SIZE; c++) {
-        for (let r = 0; r <= GRID_SIZE - 3; r++) {
-          const res = applyNoThreeConsecutive(domains, r * GRID_SIZE + c, (r + 1) * GRID_SIZE + c, (r + 2) * GRID_SIZE + c)
-          if (!res.ok) return false
-          if (res.changed) changed = true
-        }
-      }
-
-      for (let idx = 0; idx < domains.length; idx++) {
-        if (domains[idx].length === 0) return false
-      }
-    }
-    return true
-  }
-
-  function applyNoThreeConsecutive(
-    domains: Domain[], a: number, b: number, c: number,
-  ): { ok: boolean; changed: boolean } {
-    let changed = false
-
-    if (domains[a].length === 1 && domains[b].length === 1 && domains[a][0] === domains[b][0]) {
-      const other: CellValue = domains[a][0] === 'O' ? 'X' : 'O'
-      if (domains[c].length === 1) {
-        if (domains[c][0] !== other) return { ok: false, changed }
-      } else { domains[c] = [other]; changed = true }
-    }
-
-    if (domains[b].length === 1 && domains[c].length === 1 && domains[b][0] === domains[c][0]) {
-      const other: CellValue = domains[b][0] === 'O' ? 'X' : 'O'
-      if (domains[a].length === 1) {
-        if (domains[a][0] !== other) return { ok: false, changed }
-      } else { domains[a] = [other]; changed = true }
-    }
-
-    if (domains[a].length === 1 && domains[c].length === 1 && domains[a][0] === domains[c][0]) {
-      const other: CellValue = domains[a][0] === 'O' ? 'X' : 'O'
-      if (domains[b].length === 1) {
-        if (domains[b][0] !== other) return { ok: false, changed }
-      } else { domains[b] = [other]; changed = true }
-    }
-
-    return { ok: true, changed }
-  }
-
-  function applyEdgeConstraint(
-    domains: Domain[], i: number, j: number, con: Constraint,
-  ): { ok: boolean; changed: boolean } {
-    let changed = false
-    if (con === '=') {
-      if (domains[i].length === 1) {
-        const v = domains[i][0]
-        if (!domains[j].includes(v)) return { ok: false, changed }
-        if (domains[j].length > 1) { domains[j] = [v]; changed = true }
-      }
-      if (domains[j].length === 1) {
-        const v = domains[j][0]
-        if (!domains[i].includes(v)) return { ok: false, changed }
-        if (domains[i].length > 1) { domains[i] = [v]; changed = true }
-      }
-    } else if (con === 'x') {
-      if (domains[i].length === 1) {
-        const v = domains[i][0]
-        const other: CellValue = v === 'O' ? 'X' : 'O'
-        if (!domains[j].includes(other)) return { ok: false, changed }
-        if (domains[j].length > 1) { domains[j] = [other]; changed = true }
-      }
-      if (domains[j].length === 1) {
-        const v = domains[j][0]
-        const other: CellValue = v === 'O' ? 'X' : 'O'
-        if (!domains[i].includes(other)) return { ok: false, changed }
-        if (domains[i].length > 1) { domains[i] = [other]; changed = true }
-      }
-    }
-    return { ok: true, changed }
-  }
-
-  function saturateLine(
-    domains: Domain[], lineIdx: number, isRow: boolean,
-  ): { ok: boolean; changed: boolean } {
-    let countO = 0, countX = 0
-    let changed = false
-    for (let k = 0; k < GRID_SIZE; k++) {
-      const idx = isRow ? lineIdx * GRID_SIZE + k : k * GRID_SIZE + lineIdx
-      if (domains[idx].length === 1) {
-        if (domains[idx][0] === 'O') countO++; else countX++
-      }
-    }
-    if (countO > CELLS_PER_SYMBOL || countX > CELLS_PER_SYMBOL) return { ok: false, changed }
-    if (countO === CELLS_PER_SYMBOL) {
-      for (let k = 0; k < GRID_SIZE; k++) {
-        const idx = isRow ? lineIdx * GRID_SIZE + k : k * GRID_SIZE + lineIdx
-        if (domains[idx].length > 1) { domains[idx] = ['X']; changed = true }
-      }
-    }
-    if (countX === CELLS_PER_SYMBOL) {
-      for (let k = 0; k < GRID_SIZE; k++) {
-        const idx = isRow ? lineIdx * GRID_SIZE + k : k * GRID_SIZE + lineIdx
-        if (domains[idx].length > 1) { domains[idx] = ['O']; changed = true }
-      }
-    }
-    return { ok: true, changed }
-  }
-
-  function backtrack(
-    domains: Domain[],
-    hConstraints: Constraint[][],
-    vConstraints: Constraint[][],
-    solutions: CellValue[][],
-    maxSolutions: number,
-  ): void {
-    if (solutions.length >= maxSolutions) return
-    let bestIdx = -1, bestSize = Infinity
-    for (let i = 0; i < domains.length; i++) {
-      if (domains[i].length > 1 && domains[i].length < bestSize) {
-        bestSize = domains[i].length; bestIdx = i
-      }
-    }
-    if (bestIdx === -1) {
-      const board = domains.map(d => d[0])
-      if (isValidComplete(board, hConstraints, vConstraints)) solutions.push(board)
-      return
-    }
-    for (const value of domains[bestIdx]) {
-      const newDomains = domains.map(d => [...d])
-      newDomains[bestIdx] = [value]
-      if (propagate(newDomains, hConstraints, vConstraints)) {
-        backtrack(newDomains, hConstraints, vConstraints, solutions, maxSolutions)
-        if (solutions.length >= maxSolutions) return
-      }
-    }
-  }
-
-  function isValidComplete(
-    board: CellValue[],
-    hConstraints: Constraint[][],
-    vConstraints: Constraint[][],
-  ): boolean {
-    for (let i = 0; i < GRID_SIZE; i++) {
-      let rowO = 0, colO = 0
-      for (let j = 0; j < GRID_SIZE; j++) {
-        if (board[i * GRID_SIZE + j] === 'O') rowO++
-        if (board[j * GRID_SIZE + i] === 'O') colO++
-      }
-      if (rowO !== CELLS_PER_SYMBOL || colO !== CELLS_PER_SYMBOL) return false
-    }
-    for (let r = 0; r < GRID_SIZE; r++) {
-      for (let c = 0; c <= GRID_SIZE - 3; c++) {
-        const v = board[r * GRID_SIZE + c]
-        if (v === board[r * GRID_SIZE + c + 1] && v === board[r * GRID_SIZE + c + 2]) return false
-      }
-    }
-    for (let c = 0; c < GRID_SIZE; c++) {
-      for (let r = 0; r <= GRID_SIZE - 3; r++) {
-        const v = board[r * GRID_SIZE + c]
-        if (v === board[(r + 1) * GRID_SIZE + c] && v === board[(r + 2) * GRID_SIZE + c]) return false
-      }
-    }
-    for (let r = 0; r < GRID_SIZE; r++) {
-      for (let c = 0; c < GRID_SIZE - 1; c++) {
-        const con = hConstraints[r][c]
-        if (con === '=' && board[r * GRID_SIZE + c] !== board[r * GRID_SIZE + c + 1]) return false
-        if (con === 'x' && board[r * GRID_SIZE + c] === board[r * GRID_SIZE + c + 1]) return false
-      }
-    }
-    for (let r = 0; r < GRID_SIZE - 1; r++) {
-      for (let c = 0; c < GRID_SIZE; c++) {
-        const con = vConstraints[r][c]
-        if (con === '=' && board[r * GRID_SIZE + c] !== board[(r + 1) * GRID_SIZE + c]) return false
-        if (con === 'x' && board[r * GRID_SIZE + c] === board[(r + 1) * GRID_SIZE + c]) return false
-      }
-    }
-    return true
-  }
-
-  // ── Difficulty scorer ──────────────────────────────────────────────
-  // Score = sum of line-force pattern difficulties.
-  // Free techniques (don't add to score): edge constraints, saturation,
-  // no-three-consecutive. Scored technique: line logic (enumerate valid
-  // completions considering hints), weighted by unknowns^2.
-  // Backtracking adds +25 per guess.
-  function scorePuzzleDifficulty(
-    board: CellValue[],
-    hC?: Constraint[][],
-    vC?: Constraint[][],
-  ): { score: number; needsBacktracking: boolean } {
-    if (!hC || !vC) {
-      const empty = emptyConstraints()
-      hC = empty.hConstraints
-      vC = empty.vConstraints
-    }
-    const domains: Domain[] = board.map(v => (v === '.' ? ['O', 'X'] : [v]))
-    return _scoreSolve(domains, hC, vC)
-  }
-
-  function _scoreSolve(inputDomains: Domain[], hC: Constraint[][], vC: Constraint[][]): { score: number; needsBacktracking: boolean } {
-    const domains = inputDomains.map(d => [...d])
-    const { ok, score: propScore } = propagateWithScoring(domains, hC, vC)
-    if (!ok) return { score: Infinity, needsBacktracking: false }
-
-    let bestIdx = -1, bestSize = Infinity
-    for (let i = 0; i < domains.length; i++) {
-      if (domains[i].length > 1 && domains[i].length < bestSize) {
-        bestSize = domains[i].length; bestIdx = i
-      }
-    }
-    if (bestIdx === -1) return { score: propScore, needsBacktracking: false }
-
-    for (const value of domains[bestIdx]) {
-      const newDomains = domains.map(d => [...d])
-      newDomains[bestIdx] = [value]
-      const sub = _scoreSolve(newDomains, hC, vC)
-      if (sub.score < Infinity) return { score: propScore + 25 + sub.score, needsBacktracking: true }
-    }
-    return { score: Infinity, needsBacktracking: false }
-  }
-
-  // For a single line (row or column), enumerate all valid completions
-  // respecting the count constraint (3 of each) and no-three-consecutive.
-  // Any cell that has only one possible value across all completions is forced.
-  // This catches patterns like:
-  //   mms... → mms..s  (ssm completion blocked by three-consecutive)
-  //   m....m → ms..sm  (positions 1,4 forced)
-  //   m...m. → m...ms  (position 5 forced)
-  function applyLineLogic(
-    domains: Domain[], lineIdx: number, isRow: boolean,
-    hConstraints: Constraint[][], vConstraints: Constraint[][],
-  ): { ok: boolean; changed: boolean; unknowns: number; hasHints: boolean } {
-    let changed = false
-    const indices: number[] = []
-    for (let k = 0; k < GRID_SIZE; k++) {
-      indices.push(isRow ? lineIdx * GRID_SIZE + k : k * GRID_SIZE + lineIdx)
-    }
-
-    // Get edge constraints along this line
-    const lineEdges: Constraint[] = []
-    let hasHints = false
-    for (let k = 0; k < GRID_SIZE - 1; k++) {
-      const e = isRow ? hConstraints[lineIdx][k] : vConstraints[k][lineIdx]
-      lineEdges.push(e)
-      if (e !== '.') hasHints = true
-    }
-
-    const values: (CellValue | null)[] = indices.map(i =>
-      domains[i].length === 1 ? domains[i][0] : null,
-    )
-
-    let placedO = 0, placedX = 0
-    for (const v of values) {
-      if (v === 'O') placedO++
-      else if (v === 'X') placedX++
-    }
-
-    const needO = CELLS_PER_SYMBOL - placedO
-    const needX = CELLS_PER_SYMBOL - placedX
-    const unknowns: number[] = []
-    for (let k = 0; k < GRID_SIZE; k++) {
-      if (values[k] === null) unknowns.push(k)
-    }
-
-    if (unknowns.length === 0) return { ok: true, changed, unknowns: 0, hasHints }
-    if (needO < 0 || needX < 0 || needO + needX !== unknowns.length) return { ok: false, changed, unknowns: unknowns.length, hasHints }
-
-    const canBeO = new Array(GRID_SIZE).fill(false)
-    const canBeX = new Array(GRID_SIZE).fill(false)
-
-    const oChoices = combinations(unknowns, needO)
-    let validCount = 0
-
-    for (const oSet of oChoices) {
-      const oSetAsSet = new Set(oSet)
-      const line: CellValue[] = values.map((v, k) =>
-        v !== null ? v : (oSetAsSet.has(k) ? 'O' : 'X'),
-      ) as CellValue[]
-
-      let valid = true
-      for (let k = 0; k <= GRID_SIZE - 3; k++) {
-        if (line[k] === line[k + 1] && line[k] === line[k + 2]) {
-          valid = false; break
-        }
-      }
-
-      // Check edge constraints along the line
-      if (valid) {
-        for (let k = 0; k < GRID_SIZE - 1; k++) {
-          const con = lineEdges[k]
-          if (con === '=' && line[k] !== line[k + 1]) { valid = false; break }
-          if (con === 'x' && line[k] === line[k + 1]) { valid = false; break }
-        }
-      }
-
-      if (valid) {
-        validCount++
-        for (const k of unknowns) {
-          if (line[k] === 'O') canBeO[k] = true
-          else canBeX[k] = true
+      for (let i = 0; i < GRID_SIZE - 1; i++) {
+        if (hints[i] === '=') {
+          if (test[i] !== null && test[i + 1] === null) { test[i + 1] = test[i]; changed = true }
+          if (test[i + 1] !== null && test[i] === null) { test[i] = test[i + 1]; changed = true }
+          if (test[i] !== null && test[i + 1] !== null && test[i] !== test[i + 1]) return true
+        } else if (hints[i] === 'x') {
+          if (test[i] !== null && test[i + 1] === null) { test[i + 1] = test[i]! === 'O' ? 'X' : 'O'; changed = true }
+          if (test[i + 1] !== null && test[i] === null) { test[i] = test[i + 1]! === 'O' ? 'X' : 'O'; changed = true }
+          if (test[i] !== null && test[i + 1] !== null && test[i] === test[i + 1]) return true
         }
       }
     }
+    return false
+  }
 
-    if (validCount === 0) return { ok: false, changed, unknowns: unknowns.length, hasHints }
+  function findCheapestForce(
+    board: CellValue[], hC: Constraint[][], vC: Constraint[][],
+  ): { cells: { idx: number; val: CellValue }[]; score: number } | null {
+    let best: { cells: { idx: number; val: CellValue }[]; score: number } | null = null
 
-    for (const k of unknowns) {
-      const idx = indices[k]
-      if (canBeO[k] && !canBeX[k]) {
-        if (domains[idx].length > 1) { domains[idx] = ['O']; changed = true }
-      } else if (canBeX[k] && !canBeO[k]) {
-        if (domains[idx].length > 1) { domains[idx] = ['X']; changed = true }
-      } else if (!canBeO[k] && !canBeX[k]) {
-        return { ok: false, changed, unknowns: unknowns.length, hasHints }
+    for (let lineIdx = 0; lineIdx < GRID_SIZE; lineIdx++) {
+      for (const isRow of [true, false] as const) {
+        const indices: number[] = []
+        for (let k = 0; k < GRID_SIZE; k++)
+          indices.push(isRow ? lineIdx * GRID_SIZE + k : k * GRID_SIZE + lineIdx)
+
+        const hints: Constraint[] = []
+        for (let k = 0; k < GRID_SIZE - 1; k++)
+          hints.push(isRow ? hC[lineIdx][k] : vC[k][lineIdx])
+
+        const cells = indices.map(i => board[i])
+        if (cells.every(c => c !== '.')) continue
+
+        const matching = VALID_LINES.filter(line => {
+          for (let i = 0; i < GRID_SIZE; i++)
+            if (cells[i] !== '.' && cells[i] !== line[i]) return false
+          for (let i = 0; i < GRID_SIZE - 1; i++) {
+            if (hints[i] === '=' && line[i] !== line[i + 1]) return false
+            if (hints[i] === 'x' && line[i] === line[i + 1]) return false
+          }
+          return true
+        })
+
+        if (matching.length === 0) continue
+
+        const forced: { idx: number; val: CellValue }[] = []
+        for (let k = 0; k < GRID_SIZE; k++) {
+          if (cells[k] !== '.') continue
+          const vals = new Set(matching.map(l => l[k]))
+          if (vals.size === 1) forced.push({ idx: indices[k], val: [...vals][0] })
+        }
+        if (forced.length === 0) continue
+
+        // Classify: free (0) > direct (DIRECT_SCORE) > indirect (INDIRECT_SCORE)
+        let score = INDIRECT_SCORE
+        for (const { idx, val } of forced) {
+          const pos = indices.indexOf(idx)
+          if (isFreeForce(cells, hints, pos, val)) { score = 0; break }
+        }
+        if (score !== 0) {
+          for (const { idx, val } of forced) {
+            if (isDirectForce(cells, hints, indices.indexOf(idx), val)) { score = DIRECT_SCORE; break }
+          }
+        }
+
+        if (!best || score < best.score) best = { cells: forced, score }
       }
     }
 
-    return { ok: true, changed, unknowns: unknowns.length, hasHints }
+    return best
   }
 
-  function propagateWithScoring(
-    domains: Domain[],
-    hConstraints: Constraint[][],
-    vConstraints: Constraint[][],
-  ): { ok: boolean; score: number } {
+  // ── Solver ────────────────────────────────────────────────────────
+  function solveWithScoring(
+    board: CellValue[], hC: Constraint[][], vC: Constraint[][],
+  ): { solved: boolean; score: number } {
+    board = [...board]
     let score = 0
-    let changed = true
-
-    while (changed) {
-      changed = false
-
-      // Free techniques: edge constraints, saturation, no-three-consecutive
-      // These don't contribute to difficulty score
-
-      for (let r = 0; r < GRID_SIZE; r++) {
-        for (let c = 0; c < GRID_SIZE - 1; c++) {
-          const con = hConstraints[r][c]
-          if (con === '.') continue
-          const i = r * GRID_SIZE + c
-          const res = applyEdgeConstraint(domains, i, i + 1, con)
-          if (!res.ok) return { ok: false, score: Infinity }
-          if (res.changed) changed = true
-        }
-      }
-      for (let r = 0; r < GRID_SIZE - 1; r++) {
-        for (let c = 0; c < GRID_SIZE; c++) {
-          const con = vConstraints[r][c]
-          if (con === '.') continue
-          const i = r * GRID_SIZE + c
-          const res = applyEdgeConstraint(domains, i, i + GRID_SIZE, con)
-          if (!res.ok) return { ok: false, score: Infinity }
-          if (res.changed) changed = true
-        }
-      }
-
-      for (let i = 0; i < GRID_SIZE; i++) {
-        const rr = saturateLine(domains, i, true)
-        if (!rr.ok) return { ok: false, score: Infinity }
-        if (rr.changed) changed = true
-        const cr = saturateLine(domains, i, false)
-        if (!cr.ok) return { ok: false, score: Infinity }
-        if (cr.changed) changed = true
-      }
-
-      for (let r = 0; r < GRID_SIZE; r++) {
-        for (let c = 0; c <= GRID_SIZE - 3; c++) {
-          const res = applyNoThreeConsecutive(domains, r * GRID_SIZE + c, r * GRID_SIZE + c + 1, r * GRID_SIZE + c + 2)
-          if (!res.ok) return { ok: false, score: Infinity }
-          if (res.changed) changed = true
-        }
-      }
-      for (let c = 0; c < GRID_SIZE; c++) {
-        for (let r = 0; r <= GRID_SIZE - 3; r++) {
-          const res = applyNoThreeConsecutive(domains, r * GRID_SIZE + c, (r + 1) * GRID_SIZE + c, (r + 2) * GRID_SIZE + c)
-          if (!res.ok) return { ok: false, score: Infinity }
-          if (res.changed) changed = true
-        }
-      }
-
-      // Line logic — the only scored technique
-      // Score = unknowns^2 per line force, +50% if hints were involved
-      for (let i = 0; i < GRID_SIZE; i++) {
-        const rr = applyLineLogic(domains, i, true, hConstraints, vConstraints)
-        if (!rr.ok) return { ok: false, score: Infinity }
-        if (rr.changed) { score += Math.ceil(rr.unknowns * rr.unknowns * (rr.hasHints ? 1.5 : 1)); changed = true }
-        const cr = applyLineLogic(domains, i, false, hConstraints, vConstraints)
-        if (!cr.ok) return { ok: false, score: Infinity }
-        if (cr.changed) { score += Math.ceil(cr.unknowns * cr.unknowns * (cr.hasHints ? 1.5 : 1)); changed = true }
-      }
-
-      for (let idx = 0; idx < domains.length; idx++) {
-        if (domains[idx].length === 0) return { ok: false, score: Infinity }
-      }
+    while (true) {
+      const force = findCheapestForce(board, hC, vC)
+      if (!force) break
+      for (const { idx, val } of force.cells) board[idx] = val
+      score += force.score
     }
-    return { ok: true, score }
+    return { solved: board.every(v => v !== '.'), score }
   }
 
+  // ── Hint ──────────────────────────────────────────────────────────
+  function getHint(
+    board: CellValue[], hC: Constraint[][], vC: Constraint[][],
+  ): { index: number; value: CellValue } | null {
+    const force = findCheapestForce(board, hC, vC)
+    if (force && force.cells.length > 0) return { index: force.cells[0].idx, value: force.cells[0].val }
+    return null
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────
   function emptyConstraints() {
     return {
       hConstraints: Array.from({ length: GRID_SIZE }, () =>
@@ -505,114 +254,6 @@
         new Array(GRID_SIZE).fill('.') as Constraint[],
       ),
     }
-  }
-
-  // ── Generator ──────────────────────────────────────────────────────
-  function generatePuzzle(difficulty: Difficulty): Puzzle {
-    const config = DIFFICULTY_CONFIG[difficulty]
-
-    if (config.noHints) {
-      return generateNoHintPuzzle(difficulty, config)
-    }
-
-    const minScore = config.minScore ?? 0
-    const maxScore = config.maxScore ?? Infinity
-    const allowBT = config.allowBacktracking ?? true
-
-    while (true) {
-      const solution = generateCompleteBoard()
-      const { hConstraints, vConstraints } = placeAllConstraints(solution)
-      const board = removeCells(solution, hConstraints, vConstraints, config.minRemoved, config.maxRemoved)
-      pruneConstraints(board, hConstraints, vConstraints)
-
-      const { score, needsBacktracking } = scorePuzzleDifficulty(board, hConstraints, vConstraints)
-      if (!allowBT && needsBacktracking) continue
-      if (score >= minScore && score <= maxScore) {
-        return { board, solution, hConstraints, vConstraints, difficulty }
-      }
-    }
-  }
-
-  function generateNoHintPuzzle(difficulty: Difficulty, config: DifficultyConfig): Puzzle {
-    const minScore = config.minScore ?? 0
-    const maxScore = config.maxScore ?? Infinity
-    const allowBT = config.allowBacktracking ?? true
-
-    while (true) {
-      const solution = generateCompleteBoard()
-      const { hConstraints, vConstraints } = emptyConstraints()
-      const board = removeCells(solution, hConstraints, vConstraints, config.minRemoved, config.maxRemoved)
-      const { score, needsBacktracking } = scorePuzzleDifficulty(board)
-
-      if (!allowBT && needsBacktracking) continue
-      if (score >= minScore && score <= maxScore) {
-        return { board, solution, hConstraints, vConstraints, difficulty }
-      }
-    }
-  }
-
-  function generateCompleteBoard(): CellValue[] {
-    const board: CellValue[] = new Array(GRID_SIZE * GRID_SIZE).fill('.')
-    const colCounts = new Array(GRID_SIZE).fill(0)
-    if (fillRow(board, colCounts, 0)) return board
-    return generateCompleteBoard()
-  }
-
-  function fillRow(board: CellValue[], colCounts: number[], row: number): boolean {
-    if (row === GRID_SIZE) return true
-    const positions = [0, 1, 2, 3, 4, 5]
-    const combos = combinations(positions, CELLS_PER_SYMBOL)
-    shuffle(combos)
-
-    for (const oPositions of combos) {
-      const oSet = new Set(oPositions)
-      let valid = true
-
-      const rowValues: CellValue[] = []
-      for (let c = 0; c < GRID_SIZE; c++) rowValues.push(oSet.has(c) ? 'O' : 'X')
-
-      for (let c = 0; c < GRID_SIZE; c++) {
-        const isO = oSet.has(c)
-        if (isO && colCounts[c] >= CELLS_PER_SYMBOL) { valid = false; break }
-        if (!isO && (row - colCounts[c]) >= CELLS_PER_SYMBOL) { valid = false; break }
-      }
-      if (!valid) continue
-
-      for (let c = 0; c <= GRID_SIZE - 3; c++) {
-        if (rowValues[c] === rowValues[c + 1] && rowValues[c] === rowValues[c + 2]) { valid = false; break }
-      }
-      if (!valid) continue
-
-      if (row >= 2) {
-        for (let c = 0; c < GRID_SIZE; c++) {
-          const prev1 = board[(row - 1) * GRID_SIZE + c]
-          const prev2 = board[(row - 2) * GRID_SIZE + c]
-          if (rowValues[c] === prev1 && rowValues[c] === prev2) { valid = false; break }
-        }
-      }
-      if (!valid) continue
-
-      for (let c = 0; c < GRID_SIZE; c++) {
-        board[row * GRID_SIZE + c] = oSet.has(c) ? 'O' : 'X'
-        if (oSet.has(c)) colCounts[c]++
-      }
-      if (fillRow(board, colCounts, row + 1)) return true
-      for (let c = 0; c < GRID_SIZE; c++) {
-        board[row * GRID_SIZE + c] = '.'
-        if (oSet.has(c)) colCounts[c]--
-      }
-    }
-    return false
-  }
-
-  function combinations(arr: number[], k: number): number[][] {
-    if (k === 0) return [[]]
-    if (arr.length < k) return []
-    const result: number[][] = []
-    const [first, ...rest] = arr
-    for (const combo of combinations(rest, k - 1)) result.push([first, ...combo])
-    result.push(...combinations(rest, k))
-    return result
   }
 
   function placeAllConstraints(solution: CellValue[]) {
@@ -631,45 +272,6 @@
     return { hConstraints, vConstraints }
   }
 
-  function pruneConstraints(board: CellValue[], hConstraints: Constraint[][], vConstraints: Constraint[][]): void {
-    const edges: { type: 'h' | 'v'; r: number; c: number }[] = []
-    for (let r = 0; r < GRID_SIZE; r++)
-      for (let c = 0; c < GRID_SIZE - 1; c++)
-        if (hConstraints[r][c] !== '.') edges.push({ type: 'h', r, c })
-    for (let r = 0; r < GRID_SIZE - 1; r++)
-      for (let c = 0; c < GRID_SIZE; c++)
-        if (vConstraints[r][c] !== '.') edges.push({ type: 'v', r, c })
-    shuffle(edges)
-
-    for (const edge of edges) {
-      const arr = edge.type === 'h' ? hConstraints : vConstraints
-      const saved = arr[edge.r][edge.c]
-      arr[edge.r][edge.c] = '.'
-      const solutions = solve(board, hConstraints, vConstraints, 2)
-      if (solutions.length !== 1) arr[edge.r][edge.c] = saved
-    }
-  }
-
-  function removeCells(
-    solution: CellValue[], hConstraints: Constraint[][], vConstraints: Constraint[][],
-    minRemoved: number, maxRemoved: number,
-  ): CellValue[] {
-    const board = [...solution]
-    const indices = Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => i)
-    shuffle(indices)
-    let removed = 0
-    const target = minRemoved + Math.floor(Math.random() * (maxRemoved - minRemoved + 1))
-    for (const idx of indices) {
-      if (removed >= target) break
-      const saved = board[idx]
-      board[idx] = '.'
-      const solutions = solve(board, hConstraints, vConstraints, 2)
-      if (solutions.length === 1) removed++
-      else board[idx] = saved
-    }
-    return board
-  }
-
   function shuffle<T>(arr: T[]): void {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -677,46 +279,75 @@
     }
   }
 
-  // ── Validator ──────────────────────────────────────────────────────
-  function checkWin(board: CellValue[], hConstraints: Constraint[][], vConstraints: Constraint[][]): boolean {
-    for (let i = 0; i < board.length; i++) if (board[i] === '.') return false
-    for (let i = 0; i < GRID_SIZE; i++) {
-      let rowO = 0, rowX = 0, colO = 0, colX = 0
-      for (let j = 0; j < GRID_SIZE; j++) {
-        if (board[i * GRID_SIZE + j] === 'O') rowO++; else rowX++
-        if (board[j * GRID_SIZE + i] === 'O') colO++; else colX++
+  // ── Generator ──────────────────────────────────────────────────────
+  async function generatePuzzle(
+    difficulty: Difficulty, signal: { cancelled: boolean },
+  ): Promise<Puzzle | null> {
+    const config = DIFFICULTY_CONFIG[difficulty]
+    const minScore = config.minScore ?? 0
+    const maxScore = config.maxScore ?? Infinity
+    let attempts = 0
+
+    while (true) {
+      if (signal.cancelled) return null
+      const solution = generateCompleteBoard()
+      const { hConstraints: hC, vConstraints: vC } = config.noHints
+        ? emptyConstraints()
+        : placeAllConstraints(solution)
+
+      const board = removeCells(solution, hC, vC)
+      if (!config.noHints) pruneConstraints(board, hC, vC)
+
+      const { solved, score } = solveWithScoring(board, hC, vC)
+      if (solved && score >= minScore && score <= maxScore) {
+        return { board, solution, hConstraints: hC, vConstraints: vC, difficulty }
       }
-      if (rowO !== CELLS_PER_SYMBOL || rowX !== CELLS_PER_SYMBOL) return false
-      if (colO !== CELLS_PER_SYMBOL || colX !== CELLS_PER_SYMBOL) return false
+      if (++attempts % 3 === 0) await new Promise(r => setTimeout(r, 0))
     }
+  }
+
+  function removeCells(
+    solution: CellValue[], hC: Constraint[][], vC: Constraint[][],
+  ): CellValue[] {
+    const board = [...solution]
+    const indices = Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => i)
+    shuffle(indices)
+    for (const idx of indices) {
+      const saved = board[idx]
+      board[idx] = '.'
+      if (!solveWithScoring([...board], hC, vC).solved) board[idx] = saved
+    }
+    return board
+  }
+
+  function pruneConstraints(board: CellValue[], hC: Constraint[][], vC: Constraint[][]): void {
+    const edges: { type: 'h' | 'v'; r: number; c: number }[] = []
     for (let r = 0; r < GRID_SIZE; r++)
-      for (let c = 0; c <= GRID_SIZE - 3; c++) {
-        const a = board[r * GRID_SIZE + c]
-        if (a === board[r * GRID_SIZE + c + 1] && a === board[r * GRID_SIZE + c + 2]) return false
-      }
-    for (let c = 0; c < GRID_SIZE; c++)
-      for (let r = 0; r <= GRID_SIZE - 3; r++) {
-        const a = board[r * GRID_SIZE + c]
-        if (a === board[(r + 1) * GRID_SIZE + c] && a === board[(r + 2) * GRID_SIZE + c]) return false
-      }
-    for (let r = 0; r < GRID_SIZE; r++)
-      for (let c = 0; c < GRID_SIZE - 1; c++) {
-        const con = hConstraints[r][c]
-        if (con === '=' && board[r * GRID_SIZE + c] !== board[r * GRID_SIZE + c + 1]) return false
-        if (con === 'x' && board[r * GRID_SIZE + c] === board[r * GRID_SIZE + c + 1]) return false
-      }
+      for (let c = 0; c < GRID_SIZE - 1; c++)
+        if (hC[r][c] !== '.') edges.push({ type: 'h', r, c })
     for (let r = 0; r < GRID_SIZE - 1; r++)
-      for (let c = 0; c < GRID_SIZE; c++) {
-        const con = vConstraints[r][c]
-        if (con === '=' && board[r * GRID_SIZE + c] !== board[(r + 1) * GRID_SIZE + c]) return false
-        if (con === 'x' && board[r * GRID_SIZE + c] === board[(r + 1) * GRID_SIZE + c]) return false
-      }
-    return true
+      for (let c = 0; c < GRID_SIZE; c++)
+        if (vC[r][c] !== '.') edges.push({ type: 'v', r, c })
+    shuffle(edges)
+
+    for (const edge of edges) {
+      const arr = edge.type === 'h' ? hC : vC
+      const saved = arr[edge.r][edge.c]
+      arr[edge.r][edge.c] = '.'
+      if (!solveWithScoring([...board], hC, vC).solved) arr[edge.r][edge.c] = saved
+    }
+  }
+
+  // ── Validator ──────────────────────────────────────────────────────
+  // Line-force solvability guarantees a unique solution, so just compare.
+  function checkWin(board: CellValue[], sol: CellValue[]): boolean {
+    return board.every((v, i) => v === sol[i])
   }
 
   // ── Game state ─────────────────────────────────────────────────────
   let board = $state<CellValue[]>([])
   let initialBoard = $state<CellValue[]>([])
+  let solution = $state<CellValue[]>([])
   let hConstraints = $state<Constraint[][]>([])
   let vConstraints = $state<Constraint[][]>([])
   let moves = $state<Move[]>([])
@@ -743,23 +374,58 @@
     if (timerInterval !== null) { clearInterval(timerInterval); timerInterval = null }
   }
 
-  function newGame(d: Difficulty) {
+  let generationSignal: { cancelled: boolean } | null = null
+  let pregenPuzzle: Puzzle | null = null
+  let pregenSignal: { cancelled: boolean } | null = null
+
+  function startPregen(d: Difficulty) {
+    if (pregenSignal) pregenSignal.cancelled = true
+    const signal = { cancelled: false }
+    pregenSignal = signal
+    generatePuzzle(d, signal).then(p => { if (p && !signal.cancelled) pregenPuzzle = p })
+  }
+
+  function applyPuzzle(puzzle: Puzzle, d: Difficulty) {
     difficulty = d
     won = false
+    board = [...puzzle.board]
+    initialBoard = [...puzzle.board]
+    solution = [...puzzle.solution]
+    hConstraints = puzzle.hConstraints
+    vConstraints = puzzle.vConstraints
+    moves = []
+    elapsed = 0
+    loading = false
+    startTimer()
+    startPregen(d)
+  }
+
+  async function newGame(d: Difficulty) {
+    if (generationSignal) generationSignal.cancelled = true
+    if (pregenSignal) pregenSignal.cancelled = true
+
+    if (pregenPuzzle && pregenPuzzle.difficulty === d) {
+      const puzzle = pregenPuzzle
+      pregenPuzzle = null
+      stopTimer()
+      applyPuzzle(puzzle, d)
+      return
+    }
+    pregenPuzzle = null
+
+    const signal = { cancelled: false }
+    generationSignal = signal
+
     loading = true
+    difficulty = d
+    won = false
     stopTimer()
 
-    setTimeout(() => {
-      const puzzle = generatePuzzle(d)
-      board = [...puzzle.board]
-      initialBoard = [...puzzle.board]
-      hConstraints = puzzle.hConstraints
-      vConstraints = puzzle.vConstraints
-      moves = []
-      elapsed = 0
-      loading = false
-      startTimer()
-    }, 20)
+    await new Promise(r => setTimeout(r, 20))
+    const puzzle = await generatePuzzle(d, signal)
+    if (!puzzle || signal.cancelled) return
+
+    applyPuzzle(puzzle, d)
   }
 
   function toggleCell(index: number, forward: boolean) {
@@ -770,7 +436,7 @@
     const next = cycle[(currentIdx + 1) % cycle.length]
     moves = [...moves, { index, previousValue: prev }]
     board[index] = next
-    if (checkWin(board, hConstraints, vConstraints)) { won = true; stopTimer() }
+    if (checkWin(board, solution)) { won = true; stopTimer() }
   }
 
   function undo() {
@@ -785,10 +451,18 @@
     moves = []
   }
 
-  function difficultyLabel(d: Difficulty): string {
-    const level = d.replace('-nohint', '')
-    const variant = d.includes('nohint') ? ' (no hints)' : ''
-    return `${level}${variant}`
+  function useHint() {
+    if (won || loading) return
+    let hint = getHint(board, hConstraints, vConstraints)
+    if (!hint) {
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] !== solution[i]) { hint = { index: i, value: solution[i] }; break }
+      }
+    }
+    if (!hint) return
+    moves = [...moves, { index: hint.index, previousValue: board[hint.index] }]
+    board[hint.index] = hint.value
+    if (checkWin(board, solution)) { won = true; stopTimer() }
   }
 
   async function share() {
@@ -803,7 +477,6 @@
     canvas.height = size
     const ctx = canvas.getContext('2d')!
 
-    // Background
     ctx.fillStyle = '#ddd'
     ctx.beginPath()
     ctx.roundRect(0, 0, size, size, 16)
@@ -815,13 +488,11 @@
         const y = pad + r * cellSize + gap / 2
         const val = board[r * GRID_SIZE + c]
 
-        // Cell background
         ctx.fillStyle = locked[r * GRID_SIZE + c] ? '#ebe4da' : '#ffffff'
         ctx.beginPath()
         ctx.roundRect(x, y, inner, inner, 4)
         ctx.fill()
 
-        // Symbol
         const cx = x + inner / 2
         const cy = y + inner / 2
         const radius = inner * 0.3
@@ -851,7 +522,6 @@
           ctx.fill()
         }
 
-        // Horizontal constraint badge
         if (c < GRID_SIZE - 1 && hConstraints[r][c] !== '.') {
           const bx = x + inner + gap / 2
           const by = cy
@@ -866,7 +536,6 @@
           ctx.fillText(hConstraints[r][c], bx, by)
         }
 
-        // Vertical constraint badge
         if (r < GRID_SIZE - 1 && vConstraints[r][c] !== '.') {
           const bx = cx
           const by = y + inner + gap / 2
@@ -909,8 +578,7 @@
     if (!locked[i]) toggleCell(i, false)
   }
 
-  // Start first game
-  newGame('hard')
+  newGame('extreme')
 </script>
 
 <main class="min-h-svh bg-[#F8FAFD] flex flex-col items-center pt-10 pb-8 select-none">
@@ -1041,6 +709,14 @@
         disabled={loading || moves.length === 0}
       >
         Undo
+      </button>
+      <button
+        class="px-5 py-2 rounded-xl bg-amber-50 text-amber-700 font-medium hover:bg-amber-100 transition-colors
+          disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+        onclick={useHint}
+        disabled={loading || won}
+      >
+        Hint
       </button>
       <button
         class="px-5 py-2 rounded-xl bg-stone-100 text-stone-700 font-medium hover:bg-stone-200 transition-colors
