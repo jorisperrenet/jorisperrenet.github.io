@@ -11,6 +11,7 @@
         <loc>https://jorisperrenet.com/about</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.90</priority>
+        <changefreq>monthly</changefreq>
     </url>
     <url>
         <loc>https://jorisperrenet.com/padel</loc>

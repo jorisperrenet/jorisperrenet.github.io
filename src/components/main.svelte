@@ -18,6 +18,8 @@
 	{@html `<script type="application/ld+json">${JSON.stringify({
 		"@context": "https://schema.org",
 		"@type": "Person",
+		"@id": "https://jorisperrenet.com/#person",
+		"mainEntityOfPage": "https://jorisperrenet.com/about",
 		"name": "Joris Perrenet",
 		"url": "https://jorisperrenet.com/",
 		"image": "https://jorisperrenet.com/profile.jpg",
