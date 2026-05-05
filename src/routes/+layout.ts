@@ -1,5 +1,6 @@
-// Prerender every page at build time so search engines (and the user's
-// first paint) get fully-formed HTML, not an empty <script> shell.
-// `ssr` is left at the default (true) — required for prerender to actually
-// emit content; setting it to false produces empty pages.
+// this can be false if you're using a fallback (i.e. SPA mode)
 export const prerender = true;
+
+// force CSR mode
+export const ssr = false;
+export const csr = true;
