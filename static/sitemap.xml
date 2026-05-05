@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <!-- Main site (jorisperrenet.github.io) -->
     <url>
         <loc>https://jorisperrenet.com/</loc>
         <lastmod>2026-05-05</lastmod>
@@ -9,11 +11,6 @@
         <loc>https://jorisperrenet.com/about</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.90</priority>
-    </url>
-    <url>
-        <loc>https://jorisperrenet.com/blog</loc>
-        <lastmod>2026-05-05</lastmod>
-        <priority>0.80</priority>
     </url>
     <url>
         <loc>https://jorisperrenet.com/padel</loc>
@@ -30,6 +27,55 @@
         <lastmod>2026-05-05</lastmod>
         <priority>0.70</priority>
     </url>
+
+    <!-- Blog (jorisperrenet/blog repo) -->
+    <url>
+        <loc>https://jorisperrenet.com/blog</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.90</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/blog/project-cube</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.80</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/blog/project-cube/rules</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.60</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/blog/project-cube/cards</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.60</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/blog/project-cube/decks</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.60</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/blog/project-cube/pairs</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.60</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/blog/project-cube/balance</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.60</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/blog/project-cube/solver</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.60</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/blog/project-cube/conclusion</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.60</priority>
+    </url>
+
+    <!-- Durak (jorisperrenet/durak and jorisperrenet/durak-online) -->
     <url>
         <loc>https://jorisperrenet.com/durak</loc>
         <lastmod>2026-05-05</lastmod>
@@ -38,18 +84,144 @@
     <url>
         <loc>https://jorisperrenet.com/durak-online</loc>
         <lastmod>2026-05-05</lastmod>
-        <priority>0.70</priority>
+        <priority>0.80</priority>
     </url>
+
+    <!-- VectorMation (jorisperrenet/VectorMation) -->
     <url>
         <loc>https://jorisperrenet.com/VectorMation</loc>
         <lastmod>2026-05-05</lastmod>
-        <priority>0.70</priority>
+        <priority>0.80</priority>
     </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/installation.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.50</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/tutorial.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.60</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/animation.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.50</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/attributes.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.50</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/graphing.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.50</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/examples.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.60</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/advanced_examples.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.50</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/vs_manim.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.60</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.50</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/canvas.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/shapes.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/text.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/charts.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/graphing.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/diagrams.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/physics.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/science.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/threed.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/ui.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/collections.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/utilities.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/vobject.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/svg_utils.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/VectorMation/reference/attributes.html</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.40</priority>
+    </url>
+
+    <!-- Pet Detective (jorisperrenet/pet-detective) -->
     <url>
         <loc>https://jorisperrenet.com/pet-detective</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.70</priority>
     </url>
+
+    <!-- Practice Math (jorisperrenet/practice-math) -->
     <url>
         <loc>https://jorisperrenet.com/practice-math/</loc>
         <lastmod>2026-05-05</lastmod>
@@ -61,6 +233,13 @@
         <priority>0.60</priority>
     </url>
     <url>
+        <loc>https://jorisperrenet.com/practice-math/sine_waves</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.60</priority>
+    </url>
+
+    <!-- Theses (jorisperrenet/MasterThesis and jorisperrenet/BachelorThesis) -->
+    <url>
         <loc>https://jorisperrenet.com/MasterThesis/build_latex/main.pdf</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.70</priority>
@@ -70,4 +249,5 @@
         <lastmod>2026-05-05</lastmod>
         <priority>0.60</priority>
     </url>
+
 </urlset>
