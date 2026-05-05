@@ -1,26 +1,18 @@
 <script lang="ts">
   import StartPage from '../components/main.svelte';
-  const pageTitle = 'Joris Perrenet';
-  const pageDescription = 'My personal website!';
 
   import "../app.css";
   let now = new Date();
   let year = now.getFullYear();
-
-	let { children } = $props();
 </script>
 
 <svelte:head>
-	<title>{pageTitle}</title>
-	<meta name="description" content={pageDescription} />
 	<meta name="theme-color" content="#fff" />
 	<meta property="og:type" content="website" />
-	<meta property="og:title" content={pageTitle} />
-	<meta property="og:description" content={pageDescription} />
 </svelte:head>
 
-<div class="flex h-screen flex-col">
-  <main class="flex w-full flex-col px-4">
+<div class="flex min-h-screen flex-col">
+  <main class="flex w-full flex-1 flex-col">
     <StartPage />
   </main>
 

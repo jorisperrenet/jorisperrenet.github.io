@@ -2,6 +2,6 @@
 	import About from '../../components/about.svelte';
 </script>
 
-<main class="flex w-full flex-col px-4">
+<main class="flex w-full flex-col">
 	<About />
 </main>

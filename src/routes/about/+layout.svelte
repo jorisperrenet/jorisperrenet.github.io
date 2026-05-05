@@ -18,7 +18,7 @@
 	<meta property="og:description" content={pageDescription} />
 </svelte:head>
 
-<div class="flex h-screen flex-col">
+<div class="flex min-h-screen flex-col">
   <main class="flex-1">
     {@render children()}
   </main>
