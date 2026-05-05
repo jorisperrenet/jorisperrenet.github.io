@@ -33,7 +33,7 @@
     },
     {
       name: 'Master Thesis',
-      url: '/MasterThesis/build_latex/main.pdf',
+      url: '/MasterThesis/decoding-csidh.pdf',
       description: 'Decoding CSIDH: a guide to isogeny-based cryptography. Leiden University.',
       image: '/screenshots/master-thesis.png',
       tags: ['Cryptography', 'LaTeX', 'Number Theory'],
@@ -165,7 +165,7 @@
 
     <p class="py-2">
         I recently completed my MSc Mathematics at Leiden University with a thesis on isogeny-based cryptography
-        <a class="text-blue-600 dark:text-blue-400 hover:underline" href="/MasterThesis/build_latex/main.pdf"><em>Decoding CSIDH</em></a>. I build performance-focused
+        <a class="text-blue-600 dark:text-blue-400 hover:underline" href="/MasterThesis/decoding-csidh.pdf"><em>Decoding CSIDH</em></a>. I build performance-focused
         tools in Rust and Python &mdash; including a
         <a class="text-blue-600 dark:text-blue-400 hover:underline" href="https://github.com/jorisperrenet/arithmetic-progression">GPU-accelerated search</a> for arithmetic progressions of primes
         (which broke several <a class="text-blue-600 dark:text-blue-400 hover:underline" href="https://www.pzktupel.de/PAP/aprecords.php#minimalend">records</a>), an

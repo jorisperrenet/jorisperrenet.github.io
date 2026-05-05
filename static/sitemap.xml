@@ -30,66 +30,66 @@
 
     <!-- Blog (jorisperrenet/blog repo) -->
     <url>
-        <loc>https://jorisperrenet.com/blog</loc>
+        <loc>https://jorisperrenet.com/blog/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.90</priority>
     </url>
     <url>
-        <loc>https://jorisperrenet.com/blog/project-cube</loc>
+        <loc>https://jorisperrenet.com/blog/project-cube/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.80</priority>
     </url>
     <url>
-        <loc>https://jorisperrenet.com/blog/project-cube/rules</loc>
+        <loc>https://jorisperrenet.com/blog/project-cube/rules/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.60</priority>
     </url>
     <url>
-        <loc>https://jorisperrenet.com/blog/project-cube/cards</loc>
+        <loc>https://jorisperrenet.com/blog/project-cube/cards/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.60</priority>
     </url>
     <url>
-        <loc>https://jorisperrenet.com/blog/project-cube/decks</loc>
+        <loc>https://jorisperrenet.com/blog/project-cube/decks/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.60</priority>
     </url>
     <url>
-        <loc>https://jorisperrenet.com/blog/project-cube/pairs</loc>
+        <loc>https://jorisperrenet.com/blog/project-cube/pairs/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.60</priority>
     </url>
     <url>
-        <loc>https://jorisperrenet.com/blog/project-cube/balance</loc>
+        <loc>https://jorisperrenet.com/blog/project-cube/balance/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.60</priority>
     </url>
     <url>
-        <loc>https://jorisperrenet.com/blog/project-cube/solver</loc>
+        <loc>https://jorisperrenet.com/blog/project-cube/solver/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.60</priority>
     </url>
     <url>
-        <loc>https://jorisperrenet.com/blog/project-cube/conclusion</loc>
+        <loc>https://jorisperrenet.com/blog/project-cube/conclusion/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.60</priority>
     </url>
 
     <!-- Durak (jorisperrenet/durak and jorisperrenet/durak-online) -->
     <url>
-        <loc>https://jorisperrenet.com/durak</loc>
+        <loc>https://jorisperrenet.com/durak/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.70</priority>
     </url>
     <url>
-        <loc>https://jorisperrenet.com/durak-online</loc>
+        <loc>https://jorisperrenet.com/durak-online/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.80</priority>
     </url>
 
     <!-- VectorMation (jorisperrenet/VectorMation) -->
     <url>
-        <loc>https://jorisperrenet.com/VectorMation</loc>
+        <loc>https://jorisperrenet.com/VectorMation/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.80</priority>
     </url>
@@ -216,7 +216,7 @@
 
     <!-- Pet Detective (jorisperrenet/pet-detective) -->
     <url>
-        <loc>https://jorisperrenet.com/pet-detective</loc>
+        <loc>https://jorisperrenet.com/pet-detective/</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.70</priority>
     </url>
@@ -240,14 +240,29 @@
 
     <!-- Theses (jorisperrenet/MasterThesis and jorisperrenet/BachelorThesis) -->
     <url>
-        <loc>https://jorisperrenet.com/MasterThesis/build_latex/main.pdf</loc>
+        <loc>https://jorisperrenet.com/MasterThesis/</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.75</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/MasterThesis/decoding-csidh.pdf</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.70</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/BachelorThesis/</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.65</priority>
     </url>
     <url>
         <loc>https://jorisperrenet.com/BachelorThesis/Approximating_Rayleigh_Integrals_Joris_Perrenet.pdf</loc>
         <lastmod>2026-05-05</lastmod>
         <priority>0.60</priority>
+    </url>
+    <url>
+        <loc>https://jorisperrenet.com/BachelorThesis/lemmas/cotesian_numbers.pdf</loc>
+        <lastmod>2026-05-05</lastmod>
+        <priority>0.55</priority>
     </url>
 
 </urlset>

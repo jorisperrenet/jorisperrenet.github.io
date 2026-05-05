@@ -5,12 +5,32 @@
 <svelte:head>
 	<title>Joris Perrenet — MSc Mathematics & Software Engineer</title>
 	<meta name="description" content="Joris Perrenet — MSc Mathematics graduate from Leiden University, software engineer with experience in Python, Rust, and applied math. Open to software-engineering and quantitative roles." />
+	<link rel="canonical" href="https://jorisperrenet.com/" />
 	<meta name="google-site-verification" content="zi8POYIKt3_zadpQhWa2QHEVLDNG_DwGKcojBNiWi_U" />
 	<meta property="og:title" content="Joris Perrenet — MSc Mathematics & Software Engineer" />
 	<meta property="og:description" content="MSc Mathematics graduate. Open to software-engineering and quantitative roles." />
 	<meta property="og:image" content="https://jorisperrenet.com/profile.jpg" />
 	<meta property="og:url" content="https://jorisperrenet.com/" />
 	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Joris Perrenet — MSc Mathematics & Software Engineer" />
+	<meta name="twitter:description" content="MSc Mathematics graduate. Open to software-engineering and quantitative roles." />
+	<meta name="twitter:image" content="https://jorisperrenet.com/profile.jpg" />
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		"@context": "https://schema.org",
+		"@type": "Person",
+		"name": "Joris Perrenet",
+		"url": "https://jorisperrenet.com/",
+		"image": "https://jorisperrenet.com/profile.jpg",
+		"jobTitle": "Software Engineer",
+		"alumniOf": {
+			"@type": "CollegeOrUniversity",
+			"name": "Leiden University"
+		},
+		"sameAs": [
+			"https://github.com/jorisperrenet",
+			"https://www.linkedin.com/in/jorisperrenet/"
+		]
+	})}<\/script>`}
 </svelte:head>
 
 <div class="flex w-full flex-1 flex-col">
