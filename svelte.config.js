@@ -10,6 +10,17 @@ const config = {
 
 	kit: {
 		adapter: htmlMinifierAdapter(adapter()),
+		prerender: {
+			handleHttpError: ({ path, message }) => {
+				const externalRoots = [
+					'/blog', '/durak', '/durak-online', '/VectorMation',
+					'/pet-detective', '/practice-math',
+					'/MasterThesis', '/BachelorThesis'
+				];
+				if (externalRoots.some((p) => path.startsWith(p))) return;
+				throw new Error(message);
+			}
+		}
 	}
 };
 
