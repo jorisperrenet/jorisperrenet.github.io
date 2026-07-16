@@ -29,6 +29,13 @@
         <priority>0.70</priority>
     </url>
 
+    <!-- Power Sums -->
+    <url>
+        <loc>https://powersums.jorisperrenet.com/</loc>
+        <lastmod>2026-07-16</lastmod>
+        <priority>0.80</priority>
+    </url>
+
     <!-- Blog (jorisperrenet/blog repo) -->
     <url>
         <loc>https://jorisperrenet.com/blog/</loc>
