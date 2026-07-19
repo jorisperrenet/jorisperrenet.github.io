@@ -47,6 +47,8 @@ jobs:
         with:
           # SvelteKit's adapter-static writes to /build by default.
           path: build
+          # Keep .nojekyll so GitHub Pages serves SvelteKit's /_app directory.
+          include-hidden-files: true
 
   deploy:
     needs: build
