@@ -3,8 +3,16 @@
 	import SiteHeader from '$lib/site-kit/SiteHeader.svelte';
 
 	const active = $derived(
-		page.url.pathname === '/' ? 'home' : page.url.pathname.startsWith('/about') ? 'about' : page.url.pathname.startsWith('/blog') ? 'blog' : 'project'
+		page.url.pathname === '/'
+			? 'home'
+			: page.url.pathname.startsWith('/projects')
+				? 'projects'
+				: page.url.pathname.startsWith('/about')
+					? 'about'
+					: page.url.pathname.startsWith('/blog')
+						? 'blog'
+						: 'project'
 	);
 </script>
 
-<SiteHeader {active} localNavigation brandLogo />
+<SiteHeader {active} projectName="Personal website" currentProjectId="personal-website" projectHref="/" localNavigation brandLogo />

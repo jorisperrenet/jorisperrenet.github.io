@@ -612,7 +612,7 @@
 	}).replace(/</g, '\\u003c')}</script>`}
 </svelte:head>
 
-<SiteHeader projectName="Tango" projectHref="/tango" localNavigation brandLogo />
+<SiteHeader projectName="Tango" currentProjectId="tango" projectHref="/tango/" localNavigation brandLogo />
 <main class="flex flex-1 flex-col items-center bg-[#f9fbff] pb-4 pt-4 select-none dark:bg-[#111827]">
   <div class="flex w-full max-w-2xl flex-col items-center gap-4 px-3 sm:px-4">
     <div class="max-w-xl text-center">

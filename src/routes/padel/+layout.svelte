@@ -33,7 +33,7 @@
 </svelte:head>
 
 <div class="flex min-h-screen flex-col bg-[#f9fbff] text-gray-900 dark:bg-[#111827] dark:text-gray-100">
-  <SiteHeader projectName="Padel Scheduler" projectHref="/padel" localNavigation brandLogo />
+  <SiteHeader projectName="Padel Scheduler" currentProjectId="padel" projectHref="/padel/" localNavigation brandLogo />
   <main class="flex-1">
     {@render children()}
   </main>

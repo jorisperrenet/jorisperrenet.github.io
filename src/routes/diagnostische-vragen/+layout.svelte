@@ -25,7 +25,7 @@
 </svelte:head>
 
 <div class="flex min-h-screen flex-col" lang="nl">
-  <SiteHeader projectName="Diagnostische vragen" projectHref="/diagnostische-vragen" localNavigation brandLogo />
+  <SiteHeader projectName="Diagnostic Questions (NL)" currentProjectId="diagnostic-questions" projectHref="/diagnostische-vragen/" localNavigation brandLogo />
   <main class="flex-1">
     {@render children()}
   </main>
