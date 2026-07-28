@@ -2,3 +2,5 @@
 User-agent: *
 Disallow:
 Sitemap: https://jorisperrenet.com/sitemap.xml
+Sitemap: https://jorisperrenet.com/VectorMation/sitemap.xml
+Sitemap: https://powersums.jorisperrenet.com/sitemap.xml
