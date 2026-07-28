@@ -21,11 +21,6 @@
         <loc>https://jorisperrenet.com/diagnostische-vragen/</loc>
     </url>
 
-    <!-- Power Sums -->
-    <url>
-        <loc>https://powersums.jorisperrenet.com/</loc>
-    </url>
-
     <!-- Blog (jorisperrenet/blog repo) -->
     <url>
         <loc>https://jorisperrenet.com/blog/</loc>
@@ -62,7 +57,7 @@
 
     <!-- VectorMation (jorisperrenet/VectorMation) -->
     <url>
-        <loc>https://jorisperrenet.com/VectorMation/</loc>
+        <loc>https://jorisperrenet.com/VectorMation/index.html</loc>
     </url>
     <url>
         <loc>https://jorisperrenet.com/VectorMation/installation.html</loc>
@@ -147,10 +142,10 @@
         <loc>https://jorisperrenet.com/practice-math/</loc>
     </url>
     <url>
-        <loc>https://jorisperrenet.com/practice-math/derivatives</loc>
+        <loc>https://jorisperrenet.com/practice-math/derivatives/</loc>
     </url>
     <url>
-        <loc>https://jorisperrenet.com/practice-math/sine_waves</loc>
+        <loc>https://jorisperrenet.com/practice-math/sine_waves/</loc>
     </url>
 
     <!-- Theses (jorisperrenet/MasterThesis and jorisperrenet/BachelorThesis) -->
