@@ -5,8 +5,8 @@
   const pageImage = 'https://jorisperrenet.com/profile.jpg';
 
   import "../../app.css";
-  let now = new Date();
-  let year = now.getFullYear();
+  import SiteHeader from '$lib/site-kit/SiteHeader.svelte';
+  import SiteFooter from '$lib/site-kit/SiteFooter.svelte';
 
   let { children } = $props();
 </script>
@@ -15,7 +15,8 @@
 	<title>{pageTitle}</title>
 	<meta name="description" content={pageDescription} />
 	<link rel="canonical" href={pageUrl} />
-	<meta name="theme-color" content="#121519" />
+	<meta name="theme-color" content="#f9fbff" media="(prefers-color-scheme: light)" />
+	<meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)" />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content={pageTitle} />
 	<meta property="og:description" content={pageDescription} />
@@ -27,21 +28,11 @@
 	<meta name="twitter:image" content={pageImage} />
 </svelte:head>
 
-<div class="flex h-screen flex-col" style="background-color: #121519; color: #000000">
+<div class="flex min-h-screen flex-col bg-[#f9fbff] text-gray-900 dark:bg-[#111827] dark:text-gray-100">
+  <SiteHeader projectName="Padel Scheduler" projectHref="/padel" localNavigation brandLogo />
   <main class="flex-1">
     {@render children()}
   </main>
 
-  <footer>
-    <p class="text-center py-2" style="background-color: #121519; color: #ebedf0">
-      &copy {year} - Joris Perrenet
-    </p>
-  </footer>
+  <SiteFooter projectName="Padel Scheduler" sourceHref="https://github.com/jorisperrenet/jorisperrenet.github.io" localNavigation />
 </div>
-
-<style>
-  :global(html, body) {
-      background-color: #121519;
-      color: #000000;
-  }
-</style>

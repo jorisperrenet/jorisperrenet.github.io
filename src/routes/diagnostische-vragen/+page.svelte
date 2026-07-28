@@ -436,11 +436,11 @@
 
   <!-- Introductie in dropdown -->
   <div class="mb-4">
-    <button class="w-full text-left px-4 py-2 bg-orange-100 rounded hover:bg-orange-200 font-semibold" on:click={() => showIntro = !showIntro}>
+    <button class="w-full text-left px-4 py-2 bg-orange-100 text-gray-900 rounded hover:bg-orange-200 font-semibold" on:click={() => showIntro = !showIntro}>
       Wat zijn diagnostische vragen en waarom zijn ze handig?
     </button>
     {#if showIntro}
-      <div class="p-4 bg-gray-50 border-l-4 border-orange-300 mt-2 rounded">
+      <div class="p-4 bg-gray-50 text-gray-900 border-l-4 border-orange-300 mt-2 rounded">
         <p>
           Diagnostische vragen zijn strategisch ontworpen meerkeuzevragen om misvattingen bij leerlingen te constateren. Craig Barton, auteur van "How I Wish I'd Taught Maths"<sup><a href={refLink(17)} target="_blank" class="">[17]</a></sup><sup><a href={refLink(18)} target="_blank" class="">[18]</a></sup><sup><a href={refLink(19)} target="_blank" class="">[19]</a></sup>, omschrijft een diagnostische vraag als een vraag die zo is ontworpen dat hij de docent helpt een geïnformeerde beslissing te nemen over wat de beste vervolgstap is in de les.<sup><a href={refLink(14)} target="_blank" class="text-blue-600">[14]</a></sup>
         </p>
@@ -463,11 +463,11 @@
 
   <!-- Dropdowns -->
   <div class="mb-4">
-    <button class="w-full text-left px-4 py-2 bg-blue-100 rounded hover:bg-blue-200 font-semibold" on:click={() => showDiagnostischeVragen = !showDiagnostischeVragen}>
+    <button class="w-full text-left px-4 py-2 bg-blue-100 text-gray-900 rounded hover:bg-blue-200 font-semibold" on:click={() => showDiagnostischeVragen = !showDiagnostischeVragen}>
       Wat maakt een effectieve diagnostische vraag?
     </button>
     {#if showDiagnostischeVragen}
-      <div class="p-4 bg-blue-50 border-l-4 border-blue-300 mt-2 rounded">
+      <div class="p-4 bg-blue-50 text-gray-900 border-l-4 border-blue-300 mt-2 rounded">
         <p>
           Craig Barton stelt in zijn boek dat een goede diagnostische vraag moet voldoen aan de volgende criteria om effectief te zijn:<sup><a href={refLink(6)} target="_blank" class="text-blue-600">[6]</a></sup><sup><a href={refLink(1)} target="_blank" class="text-blue-600">[1]</a></sup>
         </p>
@@ -502,11 +502,11 @@
   </div>
 
   <div class="mb-4">
-    <button class="w-full text-left px-4 py-2 bg-green-100 rounded hover:bg-green-200 font-semibold" on:click={() => showWaarom = !showWaarom}>
+    <button class="w-full text-left px-4 py-2 bg-green-100 text-gray-900 rounded hover:bg-green-200 font-semibold" on:click={() => showWaarom = !showWaarom}>
       Waarom zou je diagnostische vragen gebruiken?
     </button>
     {#if showWaarom}
-      <div class="p-4 bg-green-50 border-l-4 border-green-300 mt-2 rounded">
+      <div class="p-4 bg-green-50 text-gray-900 border-l-4 border-green-300 mt-2 rounded">
         <div class="mb-4">
           <p class="mb-3">
             Craig Barton, auteur van "How I Wish I'd Taught Maths", stelt dat
@@ -515,7 +515,7 @@
         </div>
 
         <div class="grid md:grid-cols-2 gap-4 mb-4">
-          <div class="bg-white p-4 rounded border-l-2 border-blue-400">
+          <div class="bg-white p-4 text-gray-900 rounded border-l-2 border-blue-400">
             <h4 class="font-semibold text-blue-800 mb-2">Wetenschappelijke Basis</h4>
             <ul class="list-disc ml-4 text-sm space-y-1">
               <li><b>Formatieve assessment effectiviteit:</b> Onderzoek toont aan dat formatieve toetsing, waaronder diagnostische vragen en zogenaamde "hinge questions", tot de meest effectieve interventies behoren in het onderwijs.<sup><a href={refLink(10)} target="_blank" class="text-blue-600">[10]</a></sup><sup><a href={refLink(13)} target="_blank" class="text-blue-600">[13]</a></sup></li>
@@ -524,7 +524,7 @@
             </ul>
           </div>
 
-          <div class="bg-white p-4 rounded border-l-2 border-purple-400">
+          <div class="bg-white p-4 text-gray-900 rounded border-l-2 border-purple-400">
             <h4 class="font-semibold text-purple-800 mb-2">Praktische Voordelen</h4>
             <ul class="list-disc ml-4 text-sm space-y-1">
               <li><b>Directe feedback:</b> Elke verkeerde antwoordoptie is specifiek ontworpen om een bepaalde misconceptie te onthullen, waardoor leraren onmiddellijk kunnen identificeren waar leerlingen vastlopen in hun begrip.<sup><a href={refLink(1)} target="_blank" class="text-blue-600">[1]</a></sup></li>
@@ -538,11 +538,11 @@
   </div>
 
   <div class="mb-4">
-    <button class="w-full text-left px-4 py-2 bg-yellow-100 rounded hover:bg-yellow-200 font-semibold" on:click={() => showHoe = !showHoe}>
+    <button class="w-full text-left px-4 py-2 bg-yellow-100 text-gray-900 rounded hover:bg-yellow-200 font-semibold" on:click={() => showHoe = !showHoe}>
       Hoe gebruik je diagnostische vragen effectief in de praktijk?
     </button>
     {#if showHoe}
-      <div class="p-4 bg-yellow-50 border-l-4 border-yellow-300 mt-2 rounded">
+      <div class="p-4 bg-yellow-50 text-gray-900 border-l-4 border-yellow-300 mt-2 rounded">
         <p class="mb-2">
           Craig Barton heeft een specifieke procedure ontwikkeld voor het effectief inzetten van diagnostische vragen:<sup><a href={refLink(2)} target="_blank" class="text-blue-600">[2]</a></sup>
         </p>
@@ -566,11 +566,11 @@
   </div>
 
   <div class="mb-4">
-    <button class="w-full text-left px-4 py-2 bg-purple-100 rounded hover:bg-purple-200 font-semibold" on:click={() => showMakenAI = !showMakenAI}>
+    <button class="w-full text-left px-4 py-2 bg-purple-100 text-gray-900 rounded hover:bg-purple-200 font-semibold" on:click={() => showMakenAI = !showMakenAI}>
       Hoe maak je zelf diagnostische vragen met AI?
     </button>
     {#if showMakenAI}
-      <div class="p-4 bg-purple-50 border-l-4 border-purple-300 mt-2 rounded">
+      <div class="p-4 bg-purple-50 text-gray-900 border-l-4 border-purple-300 mt-2 rounded">
         <p class="mb-2">
           <b>AI als hulpmiddel bij het ontwerpen:</b> Moderne AI-tools zoals ChatGPT kunnen docenten helpen bij het ontwikkelen van diagnostische vragen, mits je de juiste prompts gebruikt.<sup><a href={refLink(5)} target="_blank" class="text-blue-600">[5]</a></sup> De Universiteit Maastricht heeft een uitgebreide AI Prompt Library ontwikkeld specifiek voor het maken van multiple choice vragen.<sup><a href={refLink(8)} target="_blank" class="text-blue-600">[8]</a></sup>
         </p>
@@ -595,13 +595,13 @@
           {#each Object.keys(aiVoorbeelden) as vak}
             <div class="border border-purple-200 rounded">
               <button
-                class="w-full text-left px-3 py-2 bg-purple-50 hover:bg-purple-100 font-medium text-sm"
+                class="w-full text-left px-3 py-2 bg-purple-50 text-gray-900 hover:bg-purple-100 font-medium text-sm"
                 on:click={() => showAIExamples[vak] = !showAIExamples[vak]}
               >
                 {vak} - Voorbeeldvraag
               </button>
               {#if showAIExamples[vak]}
-                <div class="p-3 bg-white text-sm">
+                <div class="p-3 bg-white text-gray-900 text-sm">
                   <div class="mb-3">
                     <b class="text-purple-700">Diagnostische vraag:</b>
                     <p class="mt-1">{aiVoorbeelden[vak].vraag}</p>
@@ -622,7 +622,7 @@
                     <p class="mt-1 text-gray-700">{aiVoorbeelden[vak].uitleg}</p>
                   </div>
 
-                  <div class="bg-gray-50 p-2 rounded">
+                  <div class="bg-gray-50 p-2 text-gray-900 rounded">
                     <b class="text-purple-700">AI-prompt gebruikt:</b>
                     <p class="mt-1 text-xs text-gray-600 italic">"{aiVoorbeelden[vak].prompt}"</p>
                   </div>
@@ -636,13 +636,13 @@
   </div>
 
   <h2 class="text-2xl font-bold mt-8 mb-4">Diagnostische vragen per vakgebied</h2>
-  <p class="mb-4 text-gray-700">
+  <p class="mb-4 text-gray-700 dark:text-gray-300">
     Selecteer een vakgebied om bronnen te zien van collecties met diagnostische vragen, of gebruik AI om ze zelf te genereren.
   </p>
 
   <div class="mb-6">
     <div class="block mb-2 font-semibold">Kies een vakgebied:</div>
-    <select bind:value={selectedVakgroep} class="w-full p-2 border rounded">
+    <select bind:value={selectedVakgroep} class="w-full p-2 border rounded bg-white text-gray-900">
       <option value="">-- Kies een vakgebied --</option>
       {#each vakgroepen as vakgroep}
         <option value={vakgroep.naam}>{vakgroep.naam}</option>
@@ -652,11 +652,11 @@
     {#if selectedVakgroep}
       {#each vakgroepen as vakgroep}
         {#if vakgroep.naam === selectedVakgroep}
-          <div class="mt-4 p-4 bg-gray-50 border rounded">
+          <div class="mt-4 p-4 bg-gray-50 text-gray-900 border rounded">
             <h3 class="font-semibold mb-4 text-lg">Bronnen voor {selectedVakgroep}:</h3>
             <div class="grid gap-4">
               {#each vakgroep.vakken as vak}
-                <div class="p-3 bg-white border rounded">
+                <div class="p-3 bg-white text-gray-900 border rounded">
                   <h4 class="font-semibold mb-2 text-blue-800">{vak.naam}</h4>
                   <ul class="list-disc ml-6 space-y-1">
                     {#each vak.links as link}
@@ -677,7 +677,7 @@
   <!-- Algemene bronnen sectie -->
   <h2 class="text-2xl font-bold mt-8 mb-4">Algemene bronnen en platforms</h2>
   <div class="grid md:grid-cols-2 gap-4 mb-6">
-    <div class="p-4 bg-blue-50 border rounded">
+    <div class="p-4 bg-blue-50 text-gray-900 border rounded">
       <h3 class="font-semibold mb-2">Nederlandse platforms</h3>
       <ul class="space-y-2">
         <li><a href="https://www.diagnostischevragen.nl/" target="_blank" class="text-blue-600 underline hover:text-blue-800">DiagnostischeVragen.nl</a> - De grootste Nederlandse database</li>
@@ -685,7 +685,7 @@
         <li><a href="https://www.wikiwijs.nl/" target="_blank" class="text-blue-600 underline hover:text-blue-800">Wikiwijs</a> - Open onderwijsmaterialen</li>
       </ul>
     </div>
-    <div class="p-4 bg-green-50 border rounded">
+    <div class="p-4 bg-green-50 text-gray-900 border rounded">
       <h3 class="font-semibold mb-2">Internationale platforms</h3>
       <ul class="space-y-2">
         <li><a href="https://diagnosticquestions.com" target="_blank" class="text-blue-600 underline hover:text-blue-800">DiagnosticQuestions.com</a> - Craig Barton's wereldwijde platform</li>
@@ -696,7 +696,7 @@
   </div>
 
   <!-- AI Tools sectie -->
-  <div class="p-4 bg-yellow-50 border rounded mb-6">
+  <div class="p-4 bg-yellow-50 text-gray-900 border rounded mb-6">
     <h3 class="font-semibold mb-2">AI-tools voor het maken van diagnostische vragen</h3>
     <ul class="space-y-2">
       <li><a href="https://library.maastrichtuniversity.nl/apps-tools/ai-prompt-library/create-multiple-choice-questions/" target="_blank" class="text-blue-600 underline hover:text-blue-800">Universiteit Maastricht AI Prompt Library</a> - Formats voor prompts voor multiple choice vragen</li>
@@ -725,4 +725,3 @@
     <h2 class="text-l font-bold mb-2">Meer bronnen gevonden? <a href="mailto:joris.perrenet+diagnostischevragen@gmail.com" target="_blank" rel="noopener noreferrer" class="text-blue-800">Laat het me weten.</a></h2>
   </div>
 </div>
-

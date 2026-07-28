@@ -30,7 +30,7 @@
 		},
 		"sameAs": [
 			"https://github.com/jorisperrenet",
-			"https://www.linkedin.com/in/jorisperrenet/"
+			"https://www.linkedin.com/in/joris-perrenet-0678083a5/"
 		]
 	})}<\/script>`}
 </svelte:head>
@@ -68,7 +68,7 @@
         </li>
         <li>
           <a
-            href="https://www.linkedin.com/in/jorisperrenet/"
+            href="https://www.linkedin.com/in/joris-perrenet-0678083a5/"
             target="_blank"
             rel="noopener"
             aria-label="LinkedIn"

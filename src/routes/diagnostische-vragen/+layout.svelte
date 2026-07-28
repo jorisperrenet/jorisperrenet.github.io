@@ -5,8 +5,8 @@
   const pageImage = 'https://jorisperrenet.com/profile.jpg';
 
   import "../../app.css";
-  let now = new Date();
-  let year = now.getFullYear();
+  import SiteHeader from '$lib/site-kit/SiteHeader.svelte';
+  import SiteFooter from '$lib/site-kit/SiteFooter.svelte';
 
 	let { children } = $props();
 </script>
@@ -28,14 +28,11 @@
 	<meta name="twitter:image" content={pageImage} />
 </svelte:head>
 
-<div class="flex h-screen flex-col" lang="nl">
+<div class="flex min-h-screen flex-col" lang="nl">
+  <SiteHeader projectName="Diagnostische vragen" projectHref="/diagnostische-vragen" localNavigation brandLogo />
   <main class="flex-1">
     {@render children()}
   </main>
 
-  <footer>
-    <p class="text-center py-2">
-      &copy {year} - Joris Perrenet
-    </p>
-  </footer>
+  <SiteFooter localNavigation />
 </div>

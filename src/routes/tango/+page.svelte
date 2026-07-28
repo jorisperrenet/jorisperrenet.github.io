@@ -1,5 +1,7 @@
 <script lang="ts">
   import "../../app.css";
+  import SiteHeader from '$lib/site-kit/SiteHeader.svelte';
+  import SiteFooter from '$lib/site-kit/SiteFooter.svelte';
 
   // ── Types & constants ──────────────────────────────────────────────
   type CellValue = 'O' | 'X' | '.'
@@ -351,7 +353,7 @@
   let hConstraints = $state<Constraint[][]>([])
   let vConstraints = $state<Constraint[][]>([])
   let moves = $state<Move[]>([])
-  let difficulty = $state<Difficulty>('hard')
+  let difficulty = $state<Difficulty>('medium')
   let elapsed = $state(0)
   let won = $state(false)
   let loading = $state(true)
@@ -578,68 +580,88 @@
     if (!locked[i]) toggleCell(i, false)
   }
 
-  newGame('extreme')
+  newGame('medium')
 </script>
 
 <svelte:head>
-	<title>Tango Puzzle — Joris Perrenet</title>
+	<title>Tango Puzzle Game — Practice LinkedIn Tango Online</title>
 	<meta name="description" content="Play the Tango logic puzzle in your browser: fill a 6×6 grid with suns and moons, no three in a row, equal counts per row and column. Inspired by LinkedIn Tango." />
 	<link rel="canonical" href="https://jorisperrenet.com/tango" />
 	<meta name="theme-color" content="#F8FAFD" />
 	<meta property="og:type" content="website" />
-	<meta property="og:title" content="Tango Puzzle — Joris Perrenet" />
+	<meta property="og:title" content="Tango Puzzle Game — Practice LinkedIn Tango Online" />
 	<meta property="og:description" content="Play the Tango logic puzzle in your browser: fill a 6×6 grid with suns and moons. Inspired by LinkedIn Tango." />
 	<meta property="og:url" content="https://jorisperrenet.com/tango" />
-	<meta property="og:image" content="https://jorisperrenet.com/profile.jpg" />
+	<meta property="og:image" content="https://jorisperrenet.com/screenshots/tango-preview.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Tango Puzzle — Joris Perrenet" />
+	<meta name="twitter:title" content="Tango Puzzle Game — Practice LinkedIn Tango Online" />
 	<meta name="twitter:description" content="Play the Tango logic puzzle in your browser." />
-	<meta name="twitter:image" content="https://jorisperrenet.com/profile.jpg" />
+	<meta name="twitter:image" content="https://jorisperrenet.com/screenshots/tango-preview.png" />
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'WebApplication',
+		name: 'Tango Puzzle Game',
+		url: 'https://jorisperrenet.com/tango',
+		applicationCategory: 'GameApplication',
+		operatingSystem: 'Any modern web browser',
+		isAccessibleForFree: true,
+		offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+		description: 'Practice 6×6 sun-and-moon logic puzzles inspired by LinkedIn Tango.'
+	}).replace(/</g, '\\u003c')}</script>`}
 </svelte:head>
 
-<main class="min-h-svh bg-[#F8FAFD] flex flex-col items-center pt-10 pb-8 select-none">
-  <div class="flex flex-col items-center gap-5 w-full max-w-[28rem] mx-auto px-4">
-    <h1 class="text-3xl font-bold text-stone-800 tracking-tight">Tango</h1>
+<SiteHeader projectName="Tango" projectHref="/tango" localNavigation brandLogo />
+<main class="flex flex-1 flex-col items-center bg-[#f9fbff] pb-4 pt-4 select-none dark:bg-[#111827]">
+  <div class="flex w-full max-w-2xl flex-col items-center gap-4 px-3 sm:px-4">
+    <div class="max-w-xl text-center">
+      <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-3xl">Tango Puzzle Game</h1>
+      <p class="mt-2 text-xs leading-relaxed text-gray-600 dark:text-gray-300 sm:text-sm">Place three suns and three moons in every row and column. Never make three identical symbols in a row, and follow the equal and opposite links.</p>
+    </div>
 
-    <!-- Difficulty selector -->
-    <div class="flex flex-col gap-1.5 items-center">
-      <div class="flex items-center gap-2">
-        <span class="text-[10px] font-semibold text-stone-400 uppercase tracking-wider w-12 shrink-0">hints</span>
-        <div class="flex gap-0.5 bg-stone-100 p-0.5 rounded-lg">
+    <section aria-label="Tango game" class="w-full max-w-[26rem] rounded-2xl border border-gray-200 bg-white/70 p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800/60">
+      <div class="flex flex-col items-center gap-3">
+      <!-- Difficulty selector -->
+      <div class="flex w-full flex-col items-center gap-1.5">
+        <p class="text-xs font-bold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">Difficulty</p>
+        <div class="flex items-center gap-2">
+        <span class="w-20 shrink-0 text-right text-[10px] font-semibold uppercase tracking-wider text-stone-500 dark:text-gray-400">with hints</span>
+        <div class="flex gap-0.5 rounded-lg bg-stone-100 p-0.5 dark:bg-gray-700">
           {#each HINT_LEVELS as option}
             <button
               class="px-3 py-1 rounded-md text-xs font-medium capitalize transition-all cursor-pointer
                 {difficulty === option
                   ? 'bg-white text-stone-800 shadow-sm'
-                  : 'text-stone-500 hover:text-stone-700'}"
+                  : 'text-stone-500 hover:text-stone-700 dark:text-gray-300 dark:hover:text-white'}"
               onclick={() => newGame(option)}
             >
               {option}
             </button>
           {/each}
         </div>
-      </div>
+        </div>
 
       <div class="flex items-center gap-2">
-        <span class="text-[10px] font-semibold text-stone-400 uppercase tracking-wider w-12 shrink-0">plain</span>
-        <div class="flex gap-0.5 bg-stone-100 p-0.5 rounded-lg">
+        <span class="w-20 shrink-0 text-right text-[10px] font-semibold uppercase tracking-wider text-stone-500 dark:text-gray-400">no hints</span>
+        <div class="flex gap-0.5 rounded-lg bg-stone-100 p-0.5 dark:bg-gray-700">
           {#each NOHINT_LEVELS as option}
             <button
               class="px-3 py-1 rounded-md text-xs font-medium capitalize transition-all cursor-pointer
                 {difficulty === option
                   ? 'bg-white text-stone-800 shadow-sm'
-                  : 'text-stone-500 hover:text-stone-700'}"
+                  : 'text-stone-500 hover:text-stone-700 dark:text-gray-300 dark:hover:text-white'}"
               onclick={() => newGame(option)}
             >
               {option.replace('-nohint', '')}
             </button>
           {/each}
         </div>
+        </div>
       </div>
-    </div>
 
     <!-- Board -->
-    <div class="w-full">
+    <div class="w-full max-w-[24rem] rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-stone-200 dark:ring-gray-600">
       {#if loading}
         <div class="aspect-square rounded bg-[#ebe4da] outline outline-1 outline-[#ebe4da] flex items-center justify-center">
           <span class="text-stone-400 text-lg">Generating…</span>
@@ -717,9 +739,9 @@
     </div>
 
     <!-- Controls -->
-    <div class="flex gap-3">
+    <div class="flex flex-wrap justify-center gap-3">
       <button
-        class="px-5 py-2 rounded-xl bg-stone-100 text-stone-700 font-medium hover:bg-stone-200 transition-colors
+        class="px-4 py-1.5 rounded-xl bg-stone-100 text-stone-700 font-medium hover:bg-stone-200 transition-colors
           disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         onclick={undo}
         disabled={loading || moves.length === 0}
@@ -727,7 +749,7 @@
         Undo
       </button>
       <button
-        class="px-5 py-2 rounded-xl bg-amber-50 text-amber-700 font-medium hover:bg-amber-100 transition-colors
+        class="px-4 py-1.5 rounded-xl bg-amber-50 text-amber-700 font-medium hover:bg-amber-100 transition-colors
           disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         onclick={useHint}
         disabled={loading || won}
@@ -735,7 +757,7 @@
         Hint
       </button>
       <button
-        class="px-5 py-2 rounded-xl bg-stone-100 text-stone-700 font-medium hover:bg-stone-200 transition-colors
+        class="px-4 py-1.5 rounded-xl bg-stone-100 text-stone-700 font-medium hover:bg-stone-200 transition-colors
           disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         onclick={clear}
         disabled={loading}
@@ -745,7 +767,7 @@
     </div>
 
     <!-- Timer -->
-    <div class="flex items-center gap-2 px-4 py-2 bg-white border border-stone-200 rounded-full text-sm font-mono text-stone-600">
+    <div class="flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-1.5 font-mono text-sm text-stone-600">
       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 16 14" />
@@ -753,11 +775,9 @@
       {formattedTime()}
     </div>
 
+      </div>
+    </section>
   </div>
-
-  <p class="text-center text-xs text-gray-500 mt-auto pt-8">
-    Inspired by Tango on LinkedIn. All rights belong to their respective owners.
-  </p>
 
   <!-- Win modal -->
   {#if won}
@@ -784,3 +804,9 @@
     </div>
   {/if}
 </main>
+<SiteFooter
+  projectName="Tango"
+  sourceHref="https://github.com/jorisperrenet/jorisperrenet.github.io"
+  localNavigation
+  notice="Inspired by Tango on LinkedIn. All rights belong to their respective owners."
+/>

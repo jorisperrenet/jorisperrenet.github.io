@@ -1,0 +1,35 @@
+<!-- Canonical source; copied into consuming repositories by scripts/sync.mjs. -->
+<script lang="ts">
+	import SiteFooter from './SiteFooter.svelte';
+	import SiteHeader from './SiteHeader.svelte';
+	import type { SiteSection } from './types';
+	import type { Snippet } from 'svelte';
+
+	let {
+		children,
+		active = 'project',
+		projectName = '',
+		projectHref = '',
+		sourceHref = '',
+		workspaceClass = '',
+		localNavigation = false,
+		brandLogo = false,
+		notice = ''
+	}: {
+		children: Snippet;
+		active?: SiteSection;
+		projectName?: string;
+		projectHref?: string;
+		sourceHref?: string;
+		workspaceClass?: string;
+		localNavigation?: boolean;
+		brandLogo?: boolean;
+		notice?: string;
+	} = $props();
+</script>
+
+<div class="flex min-h-screen flex-col bg-[#f9fbff] text-gray-900 dark:bg-[#111827] dark:text-gray-100">
+	<SiteHeader {active} {projectName} {projectHref} {localNavigation} {brandLogo} />
+	<main class={`flex-1 ${workspaceClass}`}>{@render children()}</main>
+	<SiteFooter {sourceHref} {projectName} {localNavigation} {notice} />
+</div>

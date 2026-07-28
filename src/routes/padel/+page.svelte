@@ -708,8 +708,8 @@
 </script>
 
 
-<div class="bg-default p-6">
-    <div style="--players: {players.length}" class="mx-auto max-w-[clamp(700px,calc(700px+65px*var(--players)),1700px)]">
+<div class="bg-[#f9fbff] dark:bg-[#111827] p-6">
+    <div class="mx-auto max-w-[106rem]">
 
     <!-- ===================== -->
     <!-- Top row: Players + Controls -->
@@ -719,20 +719,20 @@
       <!-- Controls (RIGHT) -->
       <!-- ===================== -->
       <div class="shrink-0">
-        <div class="rounded-xl bg-block p-4 shadow lg:w-[28rem]">
+        <div class="rounded-xl bg-white dark:bg-gray-800 p-4 shadow lg:w-[28rem]">
           <div class="flex flex-col gap-4 items-center">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-sm">
               <!-- Number of Rounds -->
               <div class="flex flex-col items-center">
-                <div class="mb-1 text-sm font-medium text-on-block">Rounds</div>
+                <div class="mb-1 text-sm font-medium text-gray-900 dark:text-gray-100">Rounds</div>
                 <div class="flex items-center space-x-2">
                   <button
-                    class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
+                    class="px-3 py-1 rounded bg-gray-300 text-gray-900 hover:bg-gray-400 font-bold"
                     on:click={() => numRounds = Math.max(1, numRounds - 1)}
                   >-</button>
-                  <span class="w-8 text-center font-semibold text-on-block">{numRounds}</span>
+                  <span class="w-8 text-center font-semibold text-gray-900 dark:text-gray-100">{numRounds}</span>
                   <button
-                    class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
+                    class="px-3 py-1 rounded bg-gray-300 text-gray-900 hover:bg-gray-400 font-bold"
                     on:click={() => numRounds = Math.min(10, numRounds + 1)}
                   >+</button>
                 </div>
@@ -740,15 +740,15 @@
 
               <!-- Number of Courts -->
               <div class="flex flex-col items-center">
-                <div class="mb-1 text-sm font-medium text-on-block">Courts</div>
+                <div class="mb-1 text-sm font-medium text-gray-900 dark:text-gray-100">Courts</div>
                 <div class="flex items-center space-x-2">
                   <button
-                    class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
+                    class="px-3 py-1 rounded bg-gray-300 text-gray-900 hover:bg-gray-400 font-bold"
                     on:click={() => numCourts = Math.max(1, numCourts - 1)}
                   >-</button>
-                  <span class="w-8 text-center font-semibold text-on-block">{numCourts}</span>
+                  <span class="w-8 text-center font-semibold text-gray-900 dark:text-gray-100">{numCourts}</span>
                   <button
-                    class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
+                    class="px-3 py-1 rounded bg-gray-300 text-gray-900 hover:bg-gray-400 font-bold"
                     on:click={() => numCourts = Math.min(Math.floor(numPlayers / 4), numCourts + 1)}
                   >+</button>
                 </div>
@@ -756,20 +756,20 @@
 
               <!-- Start Time -->
               <div class="flex flex-col items-center">
-                <div class="mb-1 text-sm font-medium text-on-block">Start Time</div>
+                <div class="mb-1 text-sm font-medium text-gray-900 dark:text-gray-100">Start Time</div>
                 <div class="flex items-center space-x-2">
                   <button
-                    class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
+                    class="px-3 py-1 rounded bg-gray-300 text-gray-900 hover:bg-gray-400 font-bold"
                     on:click={() => startTime = adjustTime(startTime, -30)}
                   >-</button>
                   <input
                     type="time"
                     bind:value={startTime}
                     on:blur={() => startTime = normalizeTime30(startTime)}
-                    class="w-24 text-center rounded px-2 py-1 bg-block text-on-block font-semibold [&::-webkit-calendar-picker-indicator]:hidden"
+                    class="w-24 text-center rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-semibold [&::-webkit-calendar-picker-indicator]:hidden"
                   />
                   <button
-                    class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
+                    class="px-3 py-1 rounded bg-gray-300 text-gray-900 hover:bg-gray-400 font-bold"
                     on:click={() => startTime = adjustTime(startTime, 30)}
                   >+</button>
                 </div>
@@ -777,16 +777,16 @@
 
               <!-- Total Duration -->
               <div class="flex flex-col items-center">
-                <div class="mb-1 text-sm font-medium text-on-block">Duration</div>
+                <div class="mb-1 text-sm font-medium text-gray-900 dark:text-gray-100">Duration</div>
 
                 <div class="flex items-center space-x-2">
                   <button
-                    class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
+                    class="px-3 py-1 rounded bg-gray-300 text-gray-900 hover:bg-gray-400 font-bold"
                     on:click={() => durationMinutes = Math.max(30, durationMinutes - 30)}
                   >-</button>
-                  <span class="w-12 text-center font-semibold text-on-block">{minutesToDurationLabel(durationMinutes)}</span>
+                  <span class="w-12 text-center font-semibold text-gray-900 dark:text-gray-100">{minutesToDurationLabel(durationMinutes)}</span>
                   <button
-                    class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 font-bold"
+                    class="px-3 py-1 rounded bg-gray-300 text-gray-900 hover:bg-gray-400 font-bold"
                     on:click={() => durationMinutes = durationMinutes + 30}
                   >+</button>
                 </div>
@@ -795,39 +795,39 @@
 
             <div>
               {#if stats.maxOpponentDiff == 2 && stats.maxEncounterDiff == 2}
-                  <p class="text-on-block text-white text-xs">
+                  <p class="text-gray-900 dark:text-gray-100 text-xs">
                       Badness: 3 (doesn't get worse).
                       Change the number of rounds
                   </p>
               {:else if stats.maxOpponentDiff == 2 && stats.maxEncounterDiff == 1}
-                  <p class="text-on-block text-white text-xs">
+                  <p class="text-gray-900 dark:text-gray-100 text-xs">
                       Badness: 2 (pretty bad).
                       Change the number of rounds
                   </p>
               {:else if stats.maxOpponentDiff == 1 && stats.maxEncounterDiff == 2}
-                  <p class="text-on-block text-white text-xs">
+                  <p class="text-gray-900 dark:text-gray-100 text-xs">
                       Somewhat optimal,
                       maybe change the
                       number of rounds
                   </p>
               {:else if stats.maxOpponentDiff == 1 && stats.maxEncounterDiff == 1}
-                  <p class="text-on-block text-white text-xs">
+                  <p class="text-gray-900 dark:text-gray-100 text-xs">
                       Pretty optimal!
                   </p>
               {:else if stats.maxOpponentDiff == 1 && stats.maxEncounterDiff == 0}
-                  <p class="text-on-block text-white text-xs">
+                  <p class="text-gray-900 dark:text-gray-100 text-xs">
                       Very optimal!
                   </p>
               {:else if stats.maxOpponentDiff == 0 && stats.maxEncounterDiff == 1}
-                  <p class="text-on-block text-white text-xs">
+                  <p class="text-gray-900 dark:text-gray-100 text-xs">
                       Strangely optimal.
                   </p>
               {:else if stats.maxOpponentDiff == 0 && stats.maxEncounterDiff == 0}
-                  <p class="text-on-block text-white text-xs">
+                  <p class="text-gray-900 dark:text-gray-100 text-xs">
                       Extremely optimal!
                   </p>
               {:else}
-                  <p class="text-on-block text-white text-xs">
+                  <p class="text-gray-900 dark:text-gray-100 text-xs">
                       UNKNOWN SCHEDULE OPTIMALITY
                   </p>
               {/if}
@@ -836,7 +836,7 @@
             <div class="w-full flex justify-end">
               <button
                 on:click={reset}
-                class="rounded border border-primary px-1 text-[0.6rem] font-medium text-on-block
+                class="rounded border border-[#40b6d4] px-1 text-[0.6rem] font-medium text-gray-900 dark:text-gray-100
                        hover:opacity-80 transition"
               >
                 Reset state
@@ -849,16 +849,16 @@
       <!-- ===================== -->
       <!-- Players (LEFT) -->
       <!-- ===================== -->
-      <div class="rounded-xl bg-block p-3 w-full shadow lg:w-[28rem]">
+      <div class="rounded-xl bg-white dark:bg-gray-800 p-3 w-full shadow lg:w-[28rem]">
         <div class="mb-2 flex items-center justify-between">
-          <h2 class="text-sm font-semibold text-on-block">
+          <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
             Players ({players.length})
           </h2>
 
           {#if players.length < 20}
             <button
               on:click={addPlayer}
-              class="rounded bg-primary px-2 py-0.5 text-xs font-medium text-on-primary"
+              class="rounded bg-[#40b6d4] px-2 py-0.5 text-xs font-medium text-black"
             >
               + Add
             </button>
@@ -874,20 +874,20 @@
               on:dragstart={() => onDragStart(index)}
               on:dragover|preventDefault
               on:drop={() => onDrop(index)}
-              class="flex rounded-2xl border-primary border-2 px-1 py-0.5 text-xs"
+              class="flex rounded-2xl border-[#40b6d4] border-2 px-1 py-0.5 text-xs"
             >
               <!-- Player name -->
               <input
                 type="text"
                 bind:value={player.name}
-                class="w-full rounded bg-block text-white px-1 py-0.5 text-xs text-center focus:outline-none"
+                class="w-full rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-1 py-0.5 text-xs text-center focus:outline-none"
               />
 
               <!-- Remove button -->
               <button
                 on:click={() => removePlayer(index)}
                 tabindex="-1"
-                class="text-on-block p-2 active:bg-primary"
+                class="text-gray-900 dark:text-gray-100 p-2 active:bg-[#40b6d4]"
                 title="Remove player"
               >
                 ✕
@@ -904,23 +904,23 @@
       <!-- ===================== -->
       <!-- Schedule (BELOW) -->
       <!-- ===================== -->
-      <div class="mt-6 rounded-xl bg-block p-4">
+      <div class="mt-6 rounded-xl bg-white dark:bg-gray-800 p-4">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-semibold text-on-block">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
             Schedule
           </h2>
 
           <div class="flex gap-2">
             <button
               on:click={() => randomizeCounter += 1}
-              class="rounded bg-primary px-3 py-1 text-xs font-semibold text-on-primary"
+              class="rounded bg-[#40b6d4] px-3 py-1 text-xs font-semibold text-black"
             >
               Randomize
             </button>
 
             <button
               on:click={exportSchedulePDF}
-              class="rounded bg-primary px-3 py-1 text-xs font-semibold text-on-primary"
+              class="rounded bg-[#40b6d4] px-3 py-1 text-xs font-semibold text-black"
             >
               Export PDF
             </button>
@@ -930,12 +930,12 @@
 
         <div class="overflow-x-auto">
           <!-- Original layout -->
-          <table class="min-w-full border-primary border-2 text-xs text-on-primary">
-            <thead class="bg-primary">
+          <table class="min-w-full border-[#40b6d4] border-2 text-xs text-black">
+            <thead class="bg-[#40b6d4]">
               <tr>
-                <th class="border-primary border-2 px-1 py-1 text-center">Round</th>
+                <th class="border-[#40b6d4] border-2 px-1 py-1 text-center">Round</th>
                 {#each Array(numCourts) as _, courtIndex}
-                  <th class="border-primary border-2 px-1 py-1 text-center w-40">
+                  <th class="border-[#40b6d4] border-2 px-1 py-1 text-center w-40">
                     Court {courtIndex + 1}
                   </th>
                 {/each}
@@ -944,8 +944,8 @@
 
             <tbody>
               {#each schedule as round, roundIndex}
-                <tr class="bg-block text-on-block">
-                  <td class="border-primary border-2 text-center font-medium w-28">
+                <tr class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                  <td class="border-[#40b6d4] border-2 text-center font-medium w-28">
                     Round {roundIndex + 1}
                     {#if roundTimes[roundIndex]}
                       <div class="text-[10px] text-gray-400">
@@ -955,7 +955,7 @@
                   </td>
 
                   {#each round as match}
-                    <td class="border-primary border-2 text-center">
+                    <td class="border-[#40b6d4] border-2 text-center">
                       <div class="flex flex-col gap-0">
                         <div class="rounded px-1">
                           {players[match[0][0]]?.name}
@@ -981,31 +981,30 @@
       <!-- ===================== -->
       <!-- Player Statistics Table -->
       <!-- ===================== -->
-      <div class="mt-6 rounded-xl bg-block p-4">
-        <h2 class="mb-4 text-lg font-semibold text-on-block">Player Statistics</h2>
+      <div class="mt-6 rounded-xl bg-white dark:bg-gray-800 p-4">
+        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Player Statistics</h2>
         <div class="overflow-x-auto min-w-0">
             <table class="min-w-full text-xs">
               <thead class="">
                 <tr>
                   <th class="py-1"></th>
                   <th class="px-2 py-1"></th>
-                  <th class="px-2 py-1 bg-primary text-on-primary border-2 border-primary">Teammates</th>
-                  <th class="px-2 py-1 bg-primary text-on-primary border-2 border-primary">Opponents</th>
+                  <th class="px-2 py-1 bg-[#40b6d4] text-black border-2 border-[#40b6d4]">Teammates</th>
+                  <th class="px-2 py-1 bg-[#40b6d4] text-black border-2 border-[#40b6d4]">Opponents</th>
                 </tr>
               </thead>
 
               <!-- Names row for vertical text -->
               <tbody>
-                <tr class="bg-block">
-                  <th class="border-2 border-primary bg-primary text-on-primary">Player</th>
-                  <th class="border-2 border-primary bg-primary text-on-primary">Waits</th>
+                <tr class="bg-white dark:bg-gray-800">
+                  <th class="border-2 border-[#40b6d4] bg-[#40b6d4] text-black">Player</th>
+                  <th class="border-2 border-[#40b6d4] bg-[#40b6d4] text-black">Waits</th>
 
                   <!-- Teammate names, vertical -->
-                  <td class="border-2 border-primary py-1">
+                  <td class="border-2 border-[#40b6d4] py-1">
                     <div class="grid grid-flow-col auto-cols-fr px-1.5 justify-items-center">
                       {#each players as teammate}
-                        <div class="text-[10px] text-on-block whitespace-nowrap"
-                             style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                        <div class="rotate-180 whitespace-nowrap text-[10px] text-gray-900 [writing-mode:vertical-rl] dark:text-gray-100">
                           {teammate.name}
                         </div>
                       {/each}
@@ -1013,11 +1012,10 @@
                   </td>
 
                   <!-- Opponent names, vertical -->
-                  <td class="border-2 border-primary py-1">
+                  <td class="border-2 border-[#40b6d4] py-1">
                     <div class="grid grid-flow-col auto-cols-fr px-1.5 justify-items-center">
                       {#each players as opponent}
-                        <div class="text-[10px] text-on-block whitespace-nowrap"
-                             style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                        <div class="rotate-180 whitespace-nowrap text-[10px] text-gray-900 [writing-mode:vertical-rl] dark:text-gray-100">
                           {opponent.name}
                         </div>
                       {/each}
@@ -1028,12 +1026,12 @@
 
               <tbody>
                 {#each players as player, i}
-                  <tr class="bg-block">
-                    <td class="border-2 border-primary px-2 py-1 font-medium text-on-block">{player.name}</td>
-                    <td class="border-2 border-primary px-2 py-1 text-center text-on-block">{stats.byes[i]}</td>
+                  <tr class="bg-white dark:bg-gray-800">
+                    <td class="border-2 border-[#40b6d4] px-2 py-1 font-medium text-gray-900 dark:text-gray-100">{player.name}</td>
+                    <td class="border-2 border-[#40b6d4] px-2 py-1 text-center text-gray-900 dark:text-gray-100">{stats.byes[i]}</td>
 
                     <!-- Teammates counts -->
-                    <td class="border-2 border-primary text-on-block text-[10px]">
+                    <td class="border-2 border-[#40b6d4] text-gray-900 dark:text-gray-100 text-[10px]">
                       <div class="grid grid-flow-col auto-cols-fr gap-3 px-3 place-items-center">
                         {#each players as teammate, j}
                           {#if i === j}
@@ -1046,7 +1044,7 @@
                     </td>
 
                     <!-- Opponents counts -->
-                    <td class="border-2 border-primary text-on-block text-[10px]">
+                    <td class="border-2 border-[#40b6d4] text-gray-900 dark:text-gray-100 text-[10px]">
                       <div class="grid grid-flow-col auto-cols-fr gap-3 px-3 place-items-center">
                         {#each players as opponent, j}
                           <div>
@@ -1066,24 +1064,24 @@
         </div>
 
         {#if optimality==0}
-          <p class="m-4 text-xs text-white">
+          <p class="m-4 text-xs text-gray-900 dark:text-gray-100">
             These values are proven to be optimal!!!
           </p>
         {:else if optimality==1}
-          <p class="m-4 text-xs text-white">
+          <p class="m-4 text-xs text-gray-900 dark:text-gray-100">
             These values aren't optimal, it may be that the total encounter difference could be reduced to 1!
           </p>
         {:else if optimality==2}
-          <p class="m-4 text-xs text-white">
+          <p class="m-4 text-xs text-gray-900 dark:text-gray-100">
             These values are NOT optimal, it may be that the total opponent difference could be reduced to 1! Otherwise, things are optimal.
           </p>
         {:else if optimality==3}
-          <p class="m-4 text-xs text-white">
+          <p class="m-4 text-xs text-gray-900 dark:text-gray-100">
             These values are NOT optimal, it may be that the total opponent difference could be reduced to 1! Also, maybe the total encounter difference could be reduced to 1!
           </p>
         {/if}
 
-        <ul class="mt-1 ml-4 text-xs text-gray-500 list-disc">
+        <ul class="mt-1 ml-4 text-xs text-gray-500 dark:text-gray-400 list-disc">
           <li>Maximum difference in player waits: {stats.maxWaitDiff}</li>
           <li>Maximum difference in teammate counts: {stats.maxTeammateDiff}</li>
           <li>Maximum difference in opponent counts: {stats.maxOpponentDiff}</li>
@@ -1096,31 +1094,3 @@
 
   </div>
 </div>
-
-
-<style>
-  /* Define local classes */
-  .bg-primary {
-    background-color: #40b6d4;
-  }
-
-  .border-primary {
-    border-color: #40b6d4;
-  }
-
-  .bg-default {
-    background-color: #121519;
-  }
-
-  .bg-block {
-    background-color: #242830;
-  }
-
-  .text-on-block {
-    color: #ebedf0;
-  }
-
-  .text-on-primary {
-    color: #000000;
-  }
-</style>

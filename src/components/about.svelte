@@ -7,11 +7,6 @@
 
   // Edit this list to add / reorder / refine projects.
   // Each entry: { name, url, description, image?, featured?, crop?, tags?, lang? }
-  //   - crop: [from, to] vertical slice of the image to show, as fractions
-  //           of the image's own height — aspect-ratio independent.
-  //           [0, 0.5] = top half, [0.3, 0.7] = middle 40%, [0, 0.6] = top 60%.
-  //           Values outside [0, 1] are allowed — anything past the source
-  //           renders as empty space. Omit `crop` to show the full image.
   //   - tags: small chip labels rendered under the description.
   //   - lang: BCP-47 hint (e.g. 'nl') for hyphenation — defaults to 'en'.
   const projects = [
@@ -33,7 +28,7 @@
     },
     {
       name: 'Master Thesis',
-      url: '/MasterThesis/decoding-csidh.pdf',
+      url: '/MasterThesis/',
       description: 'Decoding CSIDH: a guide to isogeny-based cryptography. Leiden University.',
       image: '/screenshots/master-thesis.png',
       tags: ['Cryptography', 'LaTeX', 'Number Theory'],
@@ -47,9 +42,9 @@
       tags: ['Linear Programming', 'Optimisation', 'PDF-generation'],
     },
     {
-      name: 'Durak (web-version)',
+      name: 'Durak AI Helper',
       url: '/durak-online',
-      description: 'In-game MCTS helper for the game of durak, using multiple threads and web-assembly.',
+      description: 'Play Durak against AI opponents or get MCTS suggestions for a real-life game.',
       image: '/screenshots/durak-online.png',
       featured: true,
       crop: [0, 0.5],
@@ -57,7 +52,7 @@
     },
     {
       name: 'Bachelor Thesis',
-      url: '/BachelorThesis/Approximating_Rayleigh_Integrals_Joris_Perrenet.pdf',
+      url: '/BachelorThesis/',
       description: 'Methods for reducing error in approximations of the Rayleigh integral. TU Delft.',
       image: '/screenshots/bachelor-thesis.png',
       tags: ['Numerical Methods', 'LaTeX'],
@@ -79,6 +74,14 @@
       tags: ['Derivatives', 'Math'],
     },
     {
+      name: 'Equal Sums of Powers',
+      url: 'https://powersums.jorisperrenet.com/',
+      description: 'A searchable leaderboard and verified archive of equal sums of like powers, near misses, and computational records.',
+      image: '/screenshots/equal-sums-of-powers.png',
+      featured: true,
+      tags: ['Leaderboard', 'Number Theory', 'Open Data'],
+    },
+    {
       name: 'Primes in Arithmetic Pro­gres­sion',
       url: 'https://github.com/jorisperrenet/arithmetic-progression',
       description: 'GPU-accelerated search for arithmetic progressions of primes, used to break multiple records.',
@@ -89,12 +92,6 @@
       url: 'https://github.com/jorisperrenet/iscripts/blob/master/INSTALL.md',
       description: 'Installation scripts and a detailed setup guide for my Arch Linux configuration.',
       tags: ['Bash', 'Arch Linux'],
-    },
-    {
-      name: 'Durak (terminal-version)',
-      url: 'https://github.com/jorisperrenet/durak',
-      description: 'Play the card game durak against a Monte Carlo Tree Search AI, written in Python and Rust.',
-      tags: ['Python', 'Rust', 'MCTS'],
     },
     {
       name: 'Diag­nos­tic Questions (NL)',
@@ -109,12 +106,6 @@
     return /^https?:\/\//.test(url);
   }
 
-  // crop: [from, to] as fractions of the source's own height — aspect-ratio
-  // independent. The image is translated by -from*100% of its own height,
-  // and the surrounding wrapper's height is set to range * (image's rendered
-  // height) by the imageCrop action below, so source y=from lines up with
-  // the top of the window. Values outside [0, 1] are allowed — anything
-  // past the source renders as empty space (background colour).
   function cropStyle(crop) {
     if (!Array.isArray(crop) || crop.length < 2) return null;
     const from = Number(crop[0]);
@@ -128,8 +119,6 @@
     };
   }
 
-  // Action: keeps the wrapper's height in sync with range * image.offsetHeight
-  // so the visible window scales with the image's rendered size.
   function imageCrop(node, params) {
     let { range } = params;
     const apply = () => {
@@ -150,6 +139,7 @@
       },
     };
   }
+
 </script>
 
 <svelte:head>
@@ -165,7 +155,7 @@
 
     <p class="py-2">
         I recently completed my MSc Mathematics at Leiden University with a thesis on isogeny-based cryptography
-        <a class="text-blue-600 dark:text-blue-400 hover:underline" href="/MasterThesis/decoding-csidh.pdf"><em>Decoding CSIDH</em></a>. I build performance-focused
+        <a class="text-blue-600 dark:text-blue-400 hover:underline" href="/MasterThesis/"><em>Decoding CSIDH</em></a>. I build performance-focused
         tools in Rust and Python &mdash; including a
         <a class="text-blue-600 dark:text-blue-400 hover:underline" href="https://github.com/jorisperrenet/arithmetic-progression">GPU-accelerated search</a> for arithmetic progressions of primes
         (which broke several <a class="text-blue-600 dark:text-blue-400 hover:underline" href="https://www.pzktupel.de/PAP/aprecords.php#minimalend">records</a>), an

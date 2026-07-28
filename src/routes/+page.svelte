@@ -1,13 +1,13 @@
 <script lang="ts">
   import StartPage from '../components/main.svelte';
+  import SiteFooter from '$lib/site-kit/SiteFooter.svelte';
 
   import "../app.css";
-  let now = new Date();
-  let year = now.getFullYear();
 </script>
 
 <svelte:head>
-	<meta name="theme-color" content="#fff" />
+	<meta name="theme-color" content="#f9fbff" media="(prefers-color-scheme: light)" />
+	<meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)" />
 	<meta property="og:type" content="website" />
 </svelte:head>
 
@@ -16,9 +16,5 @@
     <StartPage />
   </main>
 
-  <footer>
-    <p class="text-center py-2">
-      &copy {year} - Joris Perrenet
-    </p>
-  </footer>
+  <SiteFooter localNavigation />
 </div>

@@ -5,8 +5,7 @@
   const pageImage = 'https://jorisperrenet.com/profile.jpg';
 
   import "../../app.css";
-  let now = new Date();
-  let year = now.getFullYear();
+  import SiteFooter from '$lib/site-kit/SiteFooter.svelte';
 
   let { children } = $props();
 
@@ -86,7 +85,7 @@
         ],
         sameAs: [
           'https://github.com/jorisperrenet',
-          'https://www.linkedin.com/in/jorisperrenet/',
+          'https://www.linkedin.com/in/joris-perrenet-0678083a5/',
           'https://leetcode.com/JorisPerrenet/',
           'https://codeforces.com/profile/Joris_Perrenet',
           'https://math.stackexchange.com/users/1049661/jorisperrenet',
@@ -111,13 +110,13 @@
           { '@type': 'ListItem', position: 2,  name: 'VectorMation',                  url: 'https://jorisperrenet.com/VectorMation/' },
           { '@type': 'ListItem', position: 3,  name: 'Decoding CSIDH (Master thesis)',url: 'https://jorisperrenet.com/MasterThesis/' },
           { '@type': 'ListItem', position: 4,  name: 'Padel Schedule Generator',      url: 'https://jorisperrenet.com/padel' },
-          { '@type': 'ListItem', position: 5,  name: 'Durak Online (MCTS, WebAssembly)', url: 'https://jorisperrenet.com/durak-online/' },
+          { '@type': 'ListItem', position: 5,  name: 'Durak AI Helper (MCTS, WebAssembly)', url: 'https://jorisperrenet.com/durak-online/' },
           { '@type': 'ListItem', position: 6,  name: 'Approximating Rayleigh Integrals (Bachelor thesis)', url: 'https://jorisperrenet.com/BachelorThesis/' },
           { '@type': 'ListItem', position: 7,  name: 'Tango Puzzle',                  url: 'https://jorisperrenet.com/tango' },
           { '@type': 'ListItem', position: 8,  name: 'Practice Math',                 url: 'https://jorisperrenet.com/practice-math/' },
-          { '@type': 'ListItem', position: 9,  name: 'Primes in Arithmetic Progression (GPU)', url: 'https://github.com/jorisperrenet/arithmetic-progression' },
-          { '@type': 'ListItem', position: 10, name: 'Iscripts (Arch Linux setup)',   url: 'https://github.com/jorisperrenet/iscripts/blob/master/INSTALL.md' },
-          { '@type': 'ListItem', position: 11, name: 'Durak (terminal version, MCTS)',url: 'https://github.com/jorisperrenet/durak' },
+          { '@type': 'ListItem', position: 9,  name: 'Equal Sums of Powers Leaderboard', url: 'https://powersums.jorisperrenet.com/' },
+          { '@type': 'ListItem', position: 10, name: 'Primes in Arithmetic Progression (GPU)', url: 'https://github.com/jorisperrenet/arithmetic-progression' },
+          { '@type': 'ListItem', position: 11, name: 'Iscripts (Arch Linux setup)',   url: 'https://github.com/jorisperrenet/iscripts/blob/master/INSTALL.md' },
           { '@type': 'ListItem', position: 12, name: 'Diagnostische Vragen (NL)',     url: 'https://jorisperrenet.com/diagnostische-vragen' },
         ],
       },
@@ -154,9 +153,5 @@
     {@render children()}
   </main>
 
-  <footer>
-    <p class="text-center py-2">
-      &copy {year} - Joris Perrenet
-    </p>
-  </footer>
+  <SiteFooter localNavigation />
 </div>
