@@ -1,6 +1,6 @@
 <script lang="ts">
   const pageTitle = 'About Joris Perrenet — MSc Mathematics & Software Engineer';
-  const pageDescription = 'Joris Perrenet — MSc Mathematics from Leiden University (Decoding CSIDH), BSc Applied Mathematics from TU Delft. Software engineer building tools in Rust and Python: GPU-accelerated record-breaking prime search, browser MCTS engines, mathematical animation libraries, optimisation-based tournament planners.';
+  const pageDescription = 'About Joris Perrenet, an MSc mathematician and software engineer building tools in Rust, Python and WebAssembly for cryptography, optimisation and puzzles.';
   const pageUrl = 'https://jorisperrenet.com/about';
   const pageImage = 'https://jorisperrenet.com/profile.jpg';
 
@@ -41,8 +41,8 @@
         image: {
           '@type': 'ImageObject',
           url: pageImage,
-          width: 448,
-          height: 448,
+          width: 597,
+          height: 600,
         },
         jobTitle: 'Software Engineer',
         description: 'MSc Mathematics from Leiden University (thesis on isogeny-based cryptography, Decoding CSIDH). Software engineer with deep experience in Rust, Python, and applied mathematics — building performance-focused tools for cryptography, optimisation, numerical methods, and mathematical visualisation.',
@@ -136,15 +136,17 @@
 	<meta property="og:description" content={pageDescription} />
 	<meta property="og:url" content={pageUrl} />
 	<meta property="og:image" content={pageImage} />
-	<meta property="og:image:width" content="448" />
-	<meta property="og:image:height" content="448" />
+	<meta property="og:image:width" content="597" />
+	<meta property="og:image:height" content="600" />
+	<meta property="og:image:alt" content="Joris Perrenet" />
 	<meta property="profile:first_name" content="Joris" />
 	<meta property="profile:last_name" content="Perrenet" />
 	<meta property="profile:username" content="jorisperrenet" />
-	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:card" content="summary" />
 	<meta name="twitter:title" content={pageTitle} />
 	<meta name="twitter:description" content={pageDescription} />
 	<meta name="twitter:image" content={pageImage} />
+	<meta name="twitter:image:alt" content="Joris Perrenet" />
 	{@html `<script type="application/ld+json">${JSON.stringify(graph)}<\/script>`}
 </svelte:head>
 
