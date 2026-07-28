@@ -2,7 +2,7 @@
 <script lang="ts">
 	import SiteFooter from './SiteFooter.svelte';
 	import SiteHeader from './SiteHeader.svelte';
-	import type { SiteSection } from './types';
+	import type { SiteMenuItem, SiteSection } from './types';
 	import type { Snippet } from 'svelte';
 
 	let {
@@ -14,6 +14,9 @@
 		workspaceClass = '',
 		localNavigation = false,
 		brandLogo = false,
+		logoSrc = '/personal-logo.svg',
+		menuLabel = '',
+		menuItems = [],
 		notice = ''
 	}: {
 		children: Snippet;
@@ -24,12 +27,15 @@
 		workspaceClass?: string;
 		localNavigation?: boolean;
 		brandLogo?: boolean;
+		logoSrc?: string;
+		menuLabel?: string;
+		menuItems?: SiteMenuItem[];
 		notice?: string;
 	} = $props();
 </script>
 
 <div class="flex min-h-screen flex-col bg-[#f9fbff] text-gray-900 dark:bg-[#111827] dark:text-gray-100">
-	<SiteHeader {active} {projectName} {projectHref} {localNavigation} {brandLogo} />
+	<SiteHeader {active} {projectName} {projectHref} {localNavigation} {brandLogo} {logoSrc} {menuLabel} {menuItems} />
 	<main class={`flex-1 ${workspaceClass}`}>{@render children()}</main>
 	<SiteFooter {sourceHref} {projectName} {localNavigation} {notice} />
 </div>

@@ -586,12 +586,12 @@
 <svelte:head>
 	<title>Tango Puzzle Game — Practice LinkedIn Tango Online</title>
 	<meta name="description" content="Play the Tango logic puzzle in your browser: fill a 6×6 grid with suns and moons, no three in a row, equal counts per row and column. Inspired by LinkedIn Tango." />
-	<link rel="canonical" href="https://jorisperrenet.com/tango" />
+	<link rel="canonical" href="https://jorisperrenet.com/tango/" />
 	<meta name="theme-color" content="#F8FAFD" />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content="Tango Puzzle Game — Practice LinkedIn Tango Online" />
 	<meta property="og:description" content="Play the Tango logic puzzle in your browser: fill a 6×6 grid with suns and moons. Inspired by LinkedIn Tango." />
-	<meta property="og:url" content="https://jorisperrenet.com/tango" />
+	<meta property="og:url" content="https://jorisperrenet.com/tango/" />
 	<meta property="og:image" content="https://jorisperrenet.com/screenshots/tango-preview.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
@@ -603,7 +603,7 @@
 		'@context': 'https://schema.org',
 		'@type': 'WebApplication',
 		name: 'Tango Puzzle Game',
-		url: 'https://jorisperrenet.com/tango',
+		url: 'https://jorisperrenet.com/tango/',
 		applicationCategory: 'GameApplication',
 		operatingSystem: 'Any modern web browser',
 		isAccessibleForFree: true,

@@ -35,7 +35,7 @@
     },
     {
       name: 'Padel Scheduler',
-      url: '/padel',
+      url: '/padel/',
       description: 'Create mathematically optimal padel tournaments.',
       image: '/screenshots/padel.png',
       crop: [0, 0.5],
@@ -59,7 +59,7 @@
     },
     {
       name: 'Tango',
-      url: '/tango',
+      url: '/tango/',
       description: 'Practice your skills in the LinkedIn tango game!',
       image: '/screenshots/tango.png',
       featured: true,
@@ -95,7 +95,7 @@
     },
     {
       name: 'Diag­nos­tic Questions (NL)',
-      url: '/diagnostische-vragen',
+      url: '/diagnostische-vragen/',
       description: 'Curated academic references on diagnostic questions in education (Dutch).',
       lang: 'nl',
       tags: ['Svelte', 'Education'],
@@ -161,7 +161,7 @@
         (which broke several <a class="text-blue-600 dark:text-blue-400 hover:underline" href="https://www.pzktupel.de/PAP/aprecords.php#minimalend">records</a>), an
         <a class="text-blue-600 dark:text-blue-400 hover:underline" href="/durak-online">MCTS helper</a> for the card game durak
         running multi-threaded in the browser via WebAssembly, and a
-        <a class="text-blue-600 dark:text-blue-400 hover:underline" href="/padel">tournament planner</a> for padel using linear programming for optimal scheduling.
+        <a class="text-blue-600 dark:text-blue-400 hover:underline" href="/padel/">tournament planner</a> for padel using linear programming for optimal scheduling.
     </p>
 </div>
 

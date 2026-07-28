@@ -1,7 +1,7 @@
 <script lang="ts">
   const pageTitle = 'Diagnostische vragen in het onderwijs — Joris Perrenet';
   const pageDescription = 'Een overzicht van het belang en de inzet van diagnostische vragen in de les, met onderzoek en bronnen over formatief handelen.';
-  const pageUrl = 'https://jorisperrenet.com/diagnostische-vragen';
+  const pageUrl = 'https://jorisperrenet.com/diagnostische-vragen/';
 
   import "../../app.css";
   import SiteHeader from '$lib/site-kit/SiteHeader.svelte';

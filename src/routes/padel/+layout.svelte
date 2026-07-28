@@ -1,7 +1,7 @@
 <script lang="ts">
   const pageTitle = 'Padel Schedule Generator — Joris Perrenet';
   const pageDescription = 'Free padel round-robin schedule generator: enter players, courts and rounds to get a balanced rotation that maximises unique partner and opponent pairings.';
-  const pageUrl = 'https://jorisperrenet.com/padel';
+  const pageUrl = 'https://jorisperrenet.com/padel/';
   const pageImage = 'https://jorisperrenet.com/screenshots/padel.png';
 
   import "../../app.css";

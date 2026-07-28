@@ -1,7 +1,7 @@
 <script lang="ts">
   const pageTitle = 'About Joris Perrenet — MSc Mathematics & Software Engineer';
   const pageDescription = 'About Joris Perrenet, an MSc mathematician and software engineer building tools in Rust, Python and WebAssembly for cryptography, optimisation and puzzles.';
-  const pageUrl = 'https://jorisperrenet.com/about';
+  const pageUrl = 'https://jorisperrenet.com/about/';
   const pageImage = 'https://jorisperrenet.com/profile.jpg';
 
   import "../../app.css";
@@ -109,15 +109,15 @@
           { '@type': 'ListItem', position: 1,  name: 'Pet Detective Solver',          url: 'https://jorisperrenet.com/pet-detective/' },
           { '@type': 'ListItem', position: 2,  name: 'VectorMation',                  url: 'https://jorisperrenet.com/VectorMation/' },
           { '@type': 'ListItem', position: 3,  name: 'Decoding CSIDH (Master thesis)',url: 'https://jorisperrenet.com/MasterThesis/' },
-          { '@type': 'ListItem', position: 4,  name: 'Padel Schedule Generator',      url: 'https://jorisperrenet.com/padel' },
+          { '@type': 'ListItem', position: 4,  name: 'Padel Schedule Generator',      url: 'https://jorisperrenet.com/padel/' },
           { '@type': 'ListItem', position: 5,  name: 'Durak AI Helper (MCTS, WebAssembly)', url: 'https://jorisperrenet.com/durak-online/' },
           { '@type': 'ListItem', position: 6,  name: 'Approximating Rayleigh Integrals (Bachelor thesis)', url: 'https://jorisperrenet.com/BachelorThesis/' },
-          { '@type': 'ListItem', position: 7,  name: 'Tango Puzzle',                  url: 'https://jorisperrenet.com/tango' },
+          { '@type': 'ListItem', position: 7,  name: 'Tango Puzzle',                  url: 'https://jorisperrenet.com/tango/' },
           { '@type': 'ListItem', position: 8,  name: 'Practice Math',                 url: 'https://jorisperrenet.com/practice-math/' },
           { '@type': 'ListItem', position: 9,  name: 'Equal Sums of Powers Leaderboard', url: 'https://powersums.jorisperrenet.com/' },
           { '@type': 'ListItem', position: 10, name: 'Primes in Arithmetic Progression (GPU)', url: 'https://github.com/jorisperrenet/arithmetic-progression' },
           { '@type': 'ListItem', position: 11, name: 'Iscripts (Arch Linux setup)',   url: 'https://github.com/jorisperrenet/iscripts/blob/master/INSTALL.md' },
-          { '@type': 'ListItem', position: 12, name: 'Diagnostische Vragen (NL)',     url: 'https://jorisperrenet.com/diagnostische-vragen' },
+          { '@type': 'ListItem', position: 12, name: 'Diagnostische Vragen (NL)',     url: 'https://jorisperrenet.com/diagnostische-vragen/' },
         ],
       },
     ],

@@ -16,7 +16,7 @@
 	<p class="m-0 flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
 		<span>© {year} Joris Perrenet</span>
 		<span aria-hidden="true">·</span>
-		<a rel={localNavigation ? undefined : 'external'} class="hover:text-blue-600 hover:underline dark:hover:text-blue-400" href={localNavigation ? '/about' : 'https://jorisperrenet.com/about'}>About</a>
+		<a rel={localNavigation ? undefined : 'external'} class="hover:text-blue-600 hover:underline dark:hover:text-blue-400" href={localNavigation ? '/about/' : 'https://jorisperrenet.com/about/'}>About</a>
 		{#if sourceHref}
 			<span aria-hidden="true">·</span>
 			<a class="hover:text-blue-600 hover:underline dark:hover:text-blue-400" href={sourceHref}>Source{projectName ? ` for ${projectName}` : ''}</a>
